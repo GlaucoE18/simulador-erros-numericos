@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de Erros</title>
+<meta name="description" content="Simulador de propagação de erros numéricos: truncamento, arredondamento, erro absoluto e erro relativo. Cálculo Numérico, UNIVASF 2026.2.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&family=JetBrains+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<!--
+  ESTRUTURA DA PÁGINA
+  Este arquivo só define o que aparece na tela (as "caixas").
+  O visual está em estilo.css e o comportamento em interface.js.
+  Toda a matemática está em simulador.py, que roda aqui dentro do navegador.
+-->
+<div class="app">
+  <header class="barra">
+    <div class="marca">
+      <span class="logo" data-ic="calculator-minimalistic-linear"></span>
+      <div><strong>Calculadora de Erros</strong><small>Cálculo Numérico · UNIVASF · 2026.2</small></div>
+      <span class="status-python" id="status-python" title="O simulador.py roda dentro do navegador"><i></i><span id="status-texto">carregando Python…</span></span>
+    </div>
+    <nav class="abas" role="tablist" aria-label="Seções">
+      <button role="tab" id="tab-calc" aria-selected="true" data-aba="calc"><span data-ic="calculator-minimalistic-linear"></span>Calculadora</button>
+      <button role="tab" id="tab-exemplos" aria-selected="false" data-aba="exemplos"><span data-ic="clipboard-list-linear"></span><span>Exemplos<span class="txt-longo"> do roteiro</span></span></button>
+      <button role="tab" id="tab-somas" aria-selected="false" data-aba="somas"><span data-ic="repeat-linear"></span><span>Somas<span class="txt-longo"> sucessivas</span></span></button>
+      <button role="tab" id="tab-codigo" aria-selected="false" data-aba="codigo"><span data-ic="code-2-linear"></span>Código</button>
+      <button role="tab" id="tab-teoria" aria-selected="false" data-aba="teoria"><span data-ic="book-2-linear"></span>Teoria</button>
+    </nav>
+    <a class="link-git" href="https://github.com/GlaucoE18/simulador-erros-numericos" target="_blank" rel="noopener"><span data-ic="code-linear"></span><span class="txt-git">GitHub</span></a>
+  </header>
+
+  <main>
+    <!-- ================= CALCULADORA ================= -->
+    <section id="aba-calc" role="tabpanel" aria-labelledby="tab-calc">
+      <div class="grade-calc">
+        <!-- painel da esquerda: resultado e passo a passo -->
+        <div class="painel painel-resultado">
+          <div class="titulo-painel">
+            <h2><span data-ic="list-check-linear"></span>Resultado e passo a passo</h2>
+            <div class="seg" role="group" aria-label="Tipo de explicação">
+              <button id="modo-mat" aria-pressed="true"><span data-ic="lightbulb-linear"></span>Matemática</button>
+              <button id="modo-cod" aria-pressed="false"><span data-ic="code-2-linear"></span>Código</button>
+            </div>
+          </div>
+          <div id="resultado"></div>
+          <div class="player" id="player" hidden>
+            <span class="contador" id="contador"></span>
+            <button class="botao-icone" id="etapa-anterior" title="Etapa anterior" aria-label="Etapa anterior"><span data-ic="alt-arrow-left-linear"></span></button>
+            <button class="botao-icone" id="etapa-proxima" title="Próxima etapa" aria-label="Próxima etapa"><span data-ic="alt-arrow-right-linear"></span></button>
+            <button class="pilula" id="reproduzir"><span data-ic="play-linear"></span>Reproduzir</button>
+          </div>
+          <p class="plano" id="plano"></p>
+          <ol class="passos" id="passos"></ol>
+        </div>
+
+        <!-- painel da direita: o "aparelho" da calculadora -->
+        <div class="painel aparelho">
+          <div class="config">
+            <div class="config-linha"><span>Dígitos guardados (n)</span>
+              <div class="stepper"><button id="n-menos" aria-label="Diminuir n"><span data-ic="minus-circle-linear"></span></button><output id="n-valor">4</output><button id="n-mais" aria-label="Aumentar n"><span data-ic="add-circle-linear"></span></button></div>
+            </div>
+            <div class="config-linha"><span>Método</span>
+              <div class="seg acento" role="group" aria-label="Método">
+                <button data-metodo="truncamento" aria-pressed="false"><span data-ic="scissors-linear"></span>Truncamento</button>
+                <button data-metodo="arredondamento" aria-pressed="true">Arredondamento</button>
+              </div>
+            </div>
+            <div class="config-linha"><span>Contar n como</span>
+              <div class="seg" role="group" aria-label="Contar n como">
+                <button data-modo="significativos" aria-pressed="true">Dígitos significativos</button>
+                <button data-modo="casas" aria-pressed="false">Casas decimais</button>
+              </div>
+            </div>
+            <div class="config-linha"><span>Guardar x e y com n dígitos</span>
+              <button class="chave" id="chave-operandos" role="switch" aria-checked="true" aria-label="Guardar x e y com n dígitos"></button>
+            </div>
+          </div>
+
+          <div class="visor" aria-live="polite">
+            <div class="visor-maquina"><span id="visor-maq"></span><span id="visor-fase"></span></div>
+            <div class="visor-expr" id="visor-expr"></div>
+            <div class="visor-num" id="visor-num"></div>
+            <div class="visor-rodape" id="visor-rodape"></div>
+          </div>
+
+          <div class="teclado" id="teclado">
+            <button class="tecla limpa" data-t="AC">AC</button>
+            <button class="tecla funcao" data-t="BS" aria-label="Apagar"><span data-ic="backspace-linear"></span></button>
+            <button class="tecla funcao" data-t="SIN" aria-label="Trocar sinal">±</button>
+            <button class="tecla op" data-t="/" aria-label="Dividir">÷</button>
+            <button class="tecla" data-t="7">7</button><button class="tecla" data-t="8">8</button><button class="tecla" data-t="9">9</button>
+            <button class="tecla op" data-t="*" aria-label="Multiplicar">×</button>
+            <button class="tecla" data-t="4">4</button><button class="tecla" data-t="5">5</button><button class="tecla" data-t="6">6</button>
+            <button class="tecla op" data-t="-" aria-label="Subtrair">−</button>
+            <button class="tecla" data-t="1">1</button><button class="tecla" data-t="2">2</button><button class="tecla" data-t="3">3</button>
+            <button class="tecla op" data-t="+" aria-label="Somar">+</button>
+            <button class="tecla dupla" data-t="0">0</button>
+            <button class="tecla" data-t="." aria-label="Ponto decimal">.</button>
+            <button class="tecla igual" data-t="=" aria-label="Calcular">=</button>
+          </div>
+          <div class="atalhos"><span>Exemplos do roteiro</span>
+            <button class="pilula" data-preset="ex1">Ex. 1 · soma</button>
+            <button class="pilula" data-preset="ex2">Ex. 2 · cancelamento</button>
+            <button class="pilula" data-ir-somas="ex3">Ex. 3 · 10 somas <span data-ic="alt-arrow-right-linear"></span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= EXEMPLOS DO ROTEIRO ================= -->
+    <section id="aba-exemplos" role="tabpanel" aria-labelledby="tab-exemplos" hidden>
+      <div class="cabeca-aba">
+        <div><h1>Exemplos do roteiro</h1><p>Os três testes pedidos pelo professor e os testes extras da equipe, todos numa máquina de 4 dígitos significativos e com os dois métodos.</p></div>
+      </div>
+      <div class="grade-ex" id="grade-ex"><p class="sub">Carregando o Python…</p></div>
+    </section>
+
+    <!-- ================= SOMAS SUCESSIVAS ================= -->
+    <section id="aba-somas" role="tabpanel" aria-labelledby="tab-somas" hidden>
+      <div class="cabeca-aba">
+        <div><h1>Somas sucessivas</h1><p>O erro de cada soma entra na soma seguinte. Escolha a parcela e quantas vezes somar; a máquina usa o n e o modo da calculadora.</p></div>
+      </div>
+      <div class="grade-somas">
+        <div class="painel">
+          <div class="campo"><label for="s-parcela">Parcela (valor somado)</label><input id="s-parcela" value="0.56786" inputmode="decimal" autocomplete="off"></div>
+          <div class="campo"><label for="s-qtd">Quantidade de parcelas</label><input id="s-qtd" value="10" inputmode="numeric" autocomplete="off"></div>
+          <div class="campo"><label for="s-inicial">Valor inicial (opcional)</label><input id="s-inicial" value="" placeholder="vazio: começa na 1ª parcela" inputmode="decimal" autocomplete="off"></div>
+          <div class="config-linha" style="margin-bottom:12px"><span class="sub">Guardar a parcela com n dígitos</span><button class="chave" id="chave-parcela" role="switch" aria-checked="false" aria-label="Guardar a parcela com n dígitos"></button></div>
+          <p class="erro-campo" id="s-erro"></p>
+          <div class="atalhos" style="margin-top:4px"><span>Prontos</span>
+            <button class="pilula" data-somas="ex3">Exemplo 3</button>
+            <button class="pilula" data-somas="ex3-pdf">Como no PDF</button>
+            <button class="pilula" data-somas="cem">100 somas</button>
+            <button class="pilula" data-somas="ordem">1000 + 0.4</button>
+          </div>
+          <p class="sub" style="margin-top:14px" id="s-maquina"></p>
+        </div>
+        <div class="painel">
+          <div class="resumo-somas" id="resumo-somas"></div>
+          <div class="titulo-painel" style="margin-bottom:6px"><h2><span data-ic="graph-new-up-linear"></span>Erro acumulado a cada soma</h2>
+            <div class="legenda"><span><i style="background:var(--laranja)"></i>Truncamento</span><span><i style="background:var(--menta)"></i>Arredondamento</span></div></div>
+          <div class="grafico" id="grafico"></div>
+          <div class="tabela-wrap"><table class="tabela" id="tabela-somas"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CÓDIGO ================= -->
+    <section id="aba-codigo" role="tabpanel" aria-labelledby="tab-codigo" hidden>
+      <div class="cabeca-aba">
+        <div><h1>O código do simulador</h1><p>Este é o mesmo simulador.py que está rodando nesta página. Clique numa função para ir até ela; nas etapas da calculadora, o botão "ver no código" também traz você para cá.</p></div>
+      </div>
+      <div class="grade-codigo">
+        <nav class="painel indice-codigo" id="indice-codigo" aria-label="Partes do simulador.py"></nav>
+        <div class="painel leitor">
+          <div class="leitor-cab"><span>simulador.py</span><span id="leitor-info"></span></div>
+          <div class="leitor-corpo" id="leitor-corpo"><div class="marca-linha" id="marca-linha" hidden></div><pre class="leitor-numeros" id="leitor-numeros"></pre><pre class="leitor-codigo"><code id="leitor-codigo">Carregando…</code></pre></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TEORIA ================= -->
+    <section id="aba-teoria" role="tabpanel" aria-labelledby="tab-teoria" hidden>
+      <div class="cabeca-aba"><div><h1>Teoria em quatro cartões</h1><p>O mínimo para entender o que a calculadora mostra.</p></div></div>
+      <div class="grade-teoria">
+        <div class="painel card-teoria"><h3>Forma normalizada</h3>
+          <p>Uma máquina de base 10 com t dígitos guarda todo número diferente de zero como uma mantissa de t dígitos vezes uma potência de 10, com o primeiro dígito diferente de zero.</p>
+          <div class="formula">x = ± 0.d₁d₂…dₜ × 10ᵉ ,  d₁ ≠ 0</div>
+          <p>Exemplo do roteiro: 123.45 = 0.12345 × 10³.</p></div>
+        <div class="painel card-teoria"><h3>Truncar ou arredondar</h3>
+          <p>Quando o número tem mais dígitos do que cabem, a máquina precisa se livrar do excesso. O truncamento descarta; o arredondamento olha o primeiro dígito descartado e, se for 5 ou mais, soma 1 no último dígito guardado.</p>
+          <div class="formula">1.13572 = 0.1135<span class="corte-barra"></span><span class="d">72</span> × 10¹  →  1.135  ou  1.136</div>
+          <p>Erro máximo: quase 1 unidade do último dígito no truncamento, meia unidade no arredondamento.</p></div>
+        <div class="painel card-teoria"><h3>Erro absoluto e relativo</h3>
+          <p>O absoluto mede a distância entre o exato e o aproximado. O relativo divide essa distância pelo aproximado, como pede o roteiro.</p>
+          <div class="formula">Ea = |exato − aprox|        Er = Ea / |aprox|</div>
+          <p>Quando o aproximado é 0, Er não existe: é a subtração nula do Exemplo 2.</p></div>
+        <div class="painel card-teoria"><h3>Os dois vilões</h3>
+          <p><strong>Cancelamento subtrativo:</strong> ao subtrair números muito próximos, os dígitos iguais se cancelam e sobra só a parte com erro. No Exemplo 2 o erro relativo chega a 60%.</p>
+          <p><strong>Propagação:</strong> em contas em sequência, o erro de cada passo vira entrada do passo seguinte e se acumula, como no Exemplo 3.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Equipe: Glauco Erasmo · Cristiana Campinho · Alexandre</span>
+    <span>As contas são feitas pelo simulador.py (Python), rodando dentro do navegador com o Pyodide.</span>
+  </footer>
+</div>
+
+<!-- Bibliotecas externas: Pyodide (Python no navegador) e highlight.js (cores do código) -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="icones.js"></script>
+<script src="interface.js"></script>
+</body>
+</html>

@@ -4,23 +4,27 @@
 
 Uma calculadora de **precisão limitada**: ela imita uma máquina que só guarda *n* dígitos significativos (no roteiro, *t* = 4) e mostra, para cada conta, o valor exato, o valor aproximado, o erro absoluto e o erro relativo, usando **truncamento** ou **arredondamento**.
 
-> 🔗 **Dashboard online:** _link do Streamlit Cloud (preenchido após o deploy)_
-> 📄 **Relatório:** [`relatorio/relatorio.pdf`](relatorio/relatorio.pdf)
+**Calculadora online:** https://glaucoe18.github.io/simulador-erros-numericos/ (abre direto no navegador, sem instalar nada)
+
+**Relatório:** [`relatorio/relatorio.pdf`](relatorio/relatorio.pdf)
 
 ---
 
 ## Como executar
 
-São duas formas de usar, e as duas chamam **as mesmas funções** do `simulador.py`.
+São duas formas de usar, e as duas rodam **o mesmo `simulador.py`**.
 
-### 1. Dashboard no navegador (recomendado)
+### 1. Calculadora no navegador (recomendado)
+
+Abra o link online acima. A página carrega o Python dentro do navegador (com o [Pyodide](https://pyodide.org)) e executa o próprio `simulador.py`; na primeira vez isso leva alguns segundos.
+
+Para rodar a página no seu computador, sirva a pasta com o servidor que já vem no Python (abrir o `index.html` com dois cliques não funciona, porque o navegador bloqueia a leitura do `simulador.py`):
 
 ```bash
-pip install -r requirements.txt
-streamlit run app.py
+python -m http.server 8000
 ```
 
-O navegador abre em `http://localhost:8501`. Ou use o link online acima, sem instalar nada.
+Depois abra `http://localhost:8000`.
 
 ### 2. Menu no terminal (só Python, sem instalar nada)
 
@@ -44,21 +48,24 @@ Para imprimir todos os testes de uma vez (é a saída usada no relatório):
 python simulador.py --testes
 ```
 
-Requisitos: Python 3.10 ou mais novo. O menu do terminal usa só a biblioteca padrão. O dashboard precisa do Streamlit.
+Requisitos: Python 3.10 ou mais novo, só com a biblioteca padrão. A página web precisa de internet para baixar o Pyodide.
 
 ---
 
 ## Estrutura do projeto
 
 ```
-simulador.py        ← TODA a matemática + menu do terminal
-app.py              ← dashboard Streamlit (só interface; importa o simulador.py)
-requirements.txt    ← dependência do dashboard (streamlit)
-.streamlit/         ← tema escuro do dashboard
-relatorio/          ← relatório final em PDF (e o HTML de origem)
+simulador.py   ← TODA a matemática + menu do terminal + ponte com a página
+index.html     ← estrutura da página (o que aparece na tela)
+estilo.css     ← visual da página (cores, fontes, tamanhos)
+interface.js   ← comportamento da página: teclado, passo a passo, abas
+icones.js      ← desenhos dos ícones (pacote Solar)
+relatorio/     ← relatório final em PDF
 ```
 
-O `simulador.py` está dividido em 8 partes, de cima para baixo:
+**A página não faz conta nenhuma.** O `interface.js` só lê o que a pessoa digita, chama as funções `tela_...()` do `simulador.py` (parte 9) e desenha o que elas devolvem. Por isso o terminal e a página dão exatamente os mesmos números.
+
+O `simulador.py` está dividido em 9 partes, de cima para baixo:
 
 | Parte | O que faz | Funções principais |
 |---|---|---|
@@ -70,6 +77,7 @@ O `simulador.py` está dividido em 8 partes, de cima para baixo:
 | 6 | Exemplos do roteiro e testes extras | `exemplo_1`, `exemplo_2`, `exemplo_3`, ... |
 | 7 | Formatação para exibir | `formatar`, `formatar_cientifico`, `formatar_corte` |
 | 8 | Menu do terminal | `menu` |
+| 9 | Ponte com a página web | `tela_operacao`, `tela_somas`, `tela_exemplos` |
 
 ---
 
@@ -130,4 +138,6 @@ A primeira versão foi um protótipo com janela em **Tkinter**, feito pelo **Ale
 - a comparação lado a lado dos dois métodos;
 - o passo a passo do Exemplo 3;
 - o menu no terminal com a opção "Sair";
-- o dashboard web.
+- a calculadora web, com o passo a passo de cada função.
+
+Entre as duas, houve uma versão intermediária do painel em Streamlit (está no histórico de commits). Ela foi trocada pela página atual porque o Streamlit não permitia montar um teclado de calculadora nem a animação etapa por etapa.

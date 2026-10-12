@@ -23,7 +23,8 @@ Para cada conta o simulador mostra:
 Como executar
 -------------
     python simulador.py        -> menu interativo no terminal
-    streamlit run app.py       -> dashboard no navegador (que usa ESTE arquivo)
+    index.html (no navegador)  -> calculadora web, que roda ESTE arquivo
+                                  dentro do navegador (ver PARTE 9)
 
 Mapa do arquivo (de cima para baixo)
 ------------------------------------
@@ -35,17 +36,18 @@ Mapa do arquivo (de cima para baixo)
     PARTE 6 - Exemplos do roteiro e testes extras da equipe
     PARTE 7 - Formatação dos números para exibir
     PARTE 8 - Menu interativo no terminal
+    PARTE 9 - Ponte com a página web (index.html)
 
 Histórico
 ---------
 A primeira versão (protótipo com janela em Tkinter, feito pelo Alexandre)
-usava float. Ao
-testar, percebemos que o próprio float atrapalhava a simulação:
-truncar 0.29 com 2 dígitos dava 0.28, porque o computador guarda 0.29
-como 0.28999999999999998... Por isso esta versão usa o módulo decimal,
-que faz as contas em base 10, igual fazemos no caderno.
+usava float. Ao testar, percebemos que o próprio float atrapalhava a
+simulação: truncar 0.29 com 2 dígitos dava 0.28, porque o computador
+guarda 0.29 como 0.28999999999999998... Por isso esta versão usa o
+módulo decimal, que faz as contas em base 10, igual fazemos no caderno.
 """
 
+import json
 import sys
 from decimal import Decimal, InvalidOperation, ROUND_DOWN, ROUND_HALF_UP, getcontext
 
@@ -100,7 +102,7 @@ def ler_numero(texto):
       enquanto o float 0.1 vale na verdade 0.1000000000000000055511151...
 
     Se o texto não for um número, levanta ValueError com uma mensagem
-    amigável (o menu e o dashboard mostram essa mensagem para o usuário).
+    amigável (o menu e a página web mostram essa mensagem para o usuário).
     """
     if isinstance(texto, Decimal):
         return texto
@@ -327,7 +329,7 @@ def simular_operacao(x, y, op, n=4, metodo=ARREDONDAMENTO, modo=SIGNIFICATIVOS,
         4. Normaliza e ajusta o resultado para n dígitos (valor aproximado).
         5. Calcula Ea e Er.
 
-    Devolve um dicionário com tudo, para o menu ou o dashboard exibirem.
+    Devolve um dicionário com tudo, para o terminal ou a página web exibirem.
     """
     x, y = ler_numero(x), ler_numero(y)
     op = padronizar_operacao(op)
@@ -340,6 +342,13 @@ def simular_operacao(x, y, op, n=4, metodo=ARREDONDAMENTO, modo=SIGNIFICATIVOS,
         y_maquina = ajustar(y, n, metodo, modo)
     else:
         x_maquina, y_maquina = x, y
+
+    # Caso raro: no modo casas decimais, um y muito pequeno (ex.: 0.00004 com
+    # 4 casas) vira 0 dentro da máquina, e aí a máquina não consegue dividir.
+    if op == "/" and y_maquina == 0:
+        raise ZeroDivisionError(
+            f"y = {formatar(y)} vira 0 quando guardado com {descrever_precisao(n, modo)}, "
+            "e a máquina não consegue dividir por zero.")
 
     resultado_bruto = operar(x_maquina, y_maquina, op)         # etapa 3
     aproximado = ajustar(resultado_bruto, n, metodo, modo)     # etapa 4
@@ -577,6 +586,33 @@ def formatar_cientifico(valor, n_digitos=None):
     return f"{'-' if sinal == '-' else ''}0.{digitos} × 10^{expoente}"
 
 
+def separar_corte(valor, n, modo=SIGNIFICATIVOS):
+    """Separa os dígitos que a máquina GUARDA dos que ela DESCARTA.
+
+    Devolve um dicionário com as partes do número:
+        sinal        -> "-" ou ""
+        inicio       -> "0." no modo significativos; a parte inteira + "."
+                        no modo casas decimais
+        mantidos     -> os n dígitos que cabem na máquina
+        descartados  -> os dígitos que sobram (podem ser "")
+        expoente     -> o e de "× 10^e" (None no modo casas decimais)
+
+    Exemplo: 1.13572 com n = 4 (significativos)
+        -> inicio "0.", mantidos "1135", descartados "72", expoente 1
+        ou seja, 0.1135|72 × 10^1
+    """
+    if valor == 0:
+        return {"sinal": "", "inicio": "", "mantidos": "0", "descartados": "", "expoente": None}
+    sinal = "-" if valor < 0 else ""
+    if modo == SIGNIFICATIVOS:
+        _, digitos, expoente = normalizar(valor)
+        return {"sinal": sinal, "inicio": "0.", "mantidos": digitos[:n].ljust(n, "0"),
+                "descartados": digitos[n:], "expoente": expoente}
+    inteira, _, fracao = format(abs(valor.normalize()), "f").partition(".")
+    return {"sinal": sinal, "inicio": inteira + ".", "mantidos": fracao[:n].ljust(n, "0"),
+            "descartados": fracao[n:], "expoente": None}
+
+
 def formatar_corte(valor, n, modo=SIGNIFICATIVOS):
     """Mostra ONDE a máquina corta o número, com uma barra vertical.
 
@@ -589,16 +625,11 @@ def formatar_corte(valor, n, modo=SIGNIFICATIVOS):
     """
     if valor == 0:
         return "0"
-    sinal = "-" if valor < 0 else ""
-    if modo == SIGNIFICATIVOS:
-        _, digitos, expoente = normalizar(valor)
-        mantidos, descartados = digitos[:n].ljust(n, "0"), digitos[n:]
-        texto = f"{sinal}0.{mantidos}|{descartados} × 10^{expoente}"
-    else:
-        inteira, _, fracao = format(abs(valor.normalize()), "f").partition(".")
-        mantidos, descartados = fracao[:n].ljust(n, "0"), fracao[n:]
-        texto = f"{sinal}{inteira}.{mantidos}|{descartados}"
-    return texto if descartados else texto + "  (cabe inteiro, nada a descartar)"
+    c = separar_corte(valor, n, modo)
+    texto = f"{c['sinal']}{c['inicio']}{c['mantidos']}|{c['descartados']}"
+    if c["expoente"] is not None:
+        texto += f" × 10^{c['expoente']}"
+    return texto if c["descartados"] else texto + "  (cabe inteiro, nada a descartar)"
 
 
 def descrever_precisao(n, modo):
@@ -945,6 +976,132 @@ def menu():
             opcoes[escolha][1]()
         else:
             print("  [!] Opção inválida. Digite um número do menu.")
+
+
+# =====================================================================
+# PARTE 9 - PONTE COM A PÁGINA WEB (index.html)
+# =====================================================================
+#
+# A calculadora web roda ESTE arquivo dentro do navegador, com o Pyodide
+# (o Python compilado para funcionar em páginas web). O JavaScript da
+# página não faz conta nenhuma: ele chama as funções "tela_..." abaixo,
+# que usam as mesmas funções das partes 3 a 7, e recebe um texto JSON com
+# os números já formatados, prontos para desenhar na tela.
+#
+# Assim existe uma lógica só: o terminal e a página dão exatamente os
+# mesmos resultados.
+# ---------------------------------------------------------------------
+
+LIMITE_SOMAS_WEB = 2000   # na página, para a tabela não ficar gigante
+
+
+def _operacao_para_tela(r):
+    """Transforma o dicionário de simular_operacao() em textos para a tela."""
+    n, modo = r["n"], r["modo"]
+    n_mantissa = n if modo == SIGNIFICATIVOS else None
+    erros = r["erros"]
+    return {
+        "x": formatar(r["x"]), "y": formatar(r["y"]),
+        "op": r["op"], "simbolo": OPERACOES[r["op"]],
+        "n": n, "metodo": r["metodo"], "modo": modo,
+        "precisao": descrever_precisao(n, modo),
+        "ajustar_operandos": r["ajustar_operandos"],
+        "exato": formatar(r["exato"]),
+        "exato_normalizado": formatar_cientifico(r["exato"]),
+        "x_maquina": formatar_maquina(r["x_maquina"]),
+        "y_maquina": formatar_maquina(r["y_maquina"]),
+        "x_corte": separar_corte(r["x"], n, modo),
+        "y_corte": separar_corte(r["y"], n, modo),
+        "bruto": formatar(r["resultado_bruto"]),
+        "bruto_corte": separar_corte(r["resultado_bruto"], n, modo),
+        "aproximado": formatar_maquina(r["aproximado"]),
+        "aproximado_normalizado": formatar_cientifico(r["aproximado"], n_mantissa),
+        "aproximado_zero": r["aproximado"] == 0,
+        "exato_zero": r["exato"] == 0,
+        "ea": formatar_erro(erros["absoluto"]),
+        "er": formatar_erro(erros["relativo"]),
+        "er_pct": formatar_percentual(erros["percentual"]),
+        "er_indefinido": erros["relativo"] is None,
+        "er_alto": erros["relativo"] is not None and erros["relativo"] > Decimal("0.01"),
+        "sem_erro": erros["absoluto"] == 0,
+        "float": repr(r["resultado_float"]),
+        "float_difere": Decimal(repr(r["resultado_float"])) != r["exato"],
+    }
+
+
+def tela_operacao(x, y, op, n, metodo, modo, ajustar_operandos):
+    """Chamada pela página quando a pessoa aperta '='.
+
+    Calcula a operação com o método escolhido e também com o outro método
+    (para a tabela de comparação). Devolve um JSON com {"ok": True, ...}
+    ou {"ok": False, "erro": "mensagem"}.
+    """
+    try:
+        n = int(n)
+        r = simular_operacao(x, y, op, n, metodo, modo, bool(ajustar_operandos))
+        outro = ARREDONDAMENTO if metodo == TRUNCAMENTO else TRUNCAMENTO
+        r_outro = simular_operacao(x, y, op, n, outro, modo, bool(ajustar_operandos))
+        return json.dumps({"ok": True, "atual": _operacao_para_tela(r),
+                           "outro": _operacao_para_tela(r_outro)})
+    except (ValueError, ZeroDivisionError) as erro:
+        return json.dumps({"ok": False, "erro": str(erro)})
+
+
+def _somas_para_tela(r):
+    """Transforma o resultado de simular_somas_sucessivas() em textos."""
+    erros = r["erros"]
+    return {
+        "exato": formatar(r["exato"]),
+        "aproximado": formatar_maquina(r["aproximado"]),
+        "ea": formatar_erro(erros["absoluto"]),
+        "er_pct": formatar_percentual(erros["percentual"]),
+        "passos": [{
+            "passo": p["passo"],
+            "conta": f"{formatar_maquina(p['anterior'])} + {formatar_maquina(p['parcela'])}",
+            "bruto": formatar(p["soma_bruta"]),
+            "guardado": formatar_maquina(p["armazenado"]),
+            "exato": formatar(p["exato"]),
+            "erro": formatar_erro(p["erro_absoluto"]),
+            "erro_numero": float(p["erro_absoluto"]),   # só para desenhar o gráfico
+        } for p in r["passos"]],
+    }
+
+
+def tela_somas(parcela, quantidade, n, modo, inicial="", ajustar_parcela=False):
+    """Chamada pela aba 'Somas sucessivas': roda os dois métodos."""
+    try:
+        quantidade = str(quantidade).strip()
+        if not quantidade.isdigit() or not 1 <= int(quantidade) <= LIMITE_SOMAS_WEB:
+            raise ValueError(f"A quantidade deve ser um inteiro entre 1 e {LIMITE_SOMAS_WEB}.")
+        inicial = inicial if str(inicial).strip() else None
+        resultado = {metodo: _somas_para_tela(simular_somas_sucessivas(
+            parcela, int(quantidade), int(n), metodo, modo, inicial, bool(ajustar_parcela)))
+            for metodo in METODOS}
+        return json.dumps({"ok": True, **resultado})
+    except ValueError as erro:
+        return json.dumps({"ok": False, "erro": str(erro)})
+
+
+def tela_exemplos():
+    """Todos os números da aba 'Exemplos do roteiro', de uma vez só."""
+    ex1 = exemplo_1()
+    ordem = teste_ordem_das_somas()
+    razao = ex1[TRUNCAMENTO]["erros"]["absoluto"] / ex1[ARREDONDAMENTO]["erros"]["absoluto"]
+    return json.dumps({
+        "ex1": {m: _operacao_para_tela(r) for m, r in ex1.items()},
+        "ex1_razao": formatar(ajustar(razao, 2, ARREDONDAMENTO)),
+        "ex2": {m: _operacao_para_tela(r) for m, r in exemplo_2().items()},
+        "ex3": {m: _somas_para_tela(r) for m, r in exemplo_3().items()},
+        "ex3_pdf": {m: _somas_para_tela(r) for m, r in exemplo_3(4, CASAS).items()},
+        "divisao": {m: _operacao_para_tela(r) for m, r in teste_divisao().items()},
+        "ordem": {
+            "grande_primeiro": formatar_maquina(ordem["grande_primeiro"]["aproximado"]),
+            "soma_pequenos": formatar_maquina(ordem["soma_pequenos"]["aproximado"]),
+            "pequenos_primeiro": formatar_maquina(ordem["pequenos_primeiro"]["aproximado"]),
+        },
+        "float": [{"conta": conta, "float": repr(f), "decimal": formatar(d)}
+                  for conta, f, d in curiosidades_float()],
+    })
 
 
 if __name__ == "__main__":

@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<title>Calculadora de Erros · Relatório final</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&family=JetBrains+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Relatório para impressão (A4): páginas claras, blocos de código escuros como no editor. */
+@page { size: A4; margin: 18mm 17mm 20mm;
+  @bottom-left { content: "Calculadora de Erros · Cálculo Numérico · UNIVASF 2026.2"; font: 7.5pt "Plus Jakarta Sans", sans-serif; color: #8a94a3; }
+  @bottom-right { content: counter(page); font: 8pt "JetBrains Mono", monospace; color: #8a94a3; } }
+@page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+:root { --tinta: #111820; --tinta-2: #4b5563; --tinta-3: #8a94a3; --linha: #dfe5eb; --suave: #f3f6f8;
+  --menta: #0a8f6c; --menta-fundo: #e6f6f0; --laranja: #d9561d; --laranja-fundo: #fdf0e8;
+  --f-ui: "Plus Jakarta Sans", "Segoe UI", sans-serif; --f-titulo: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  --f-num: "JetBrains Mono", Consolas, monospace; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: var(--f-ui); font-size: 10.2pt; line-height: 1.55; color: var(--tinta); background: #fff; }
+a { color: inherit; text-decoration: none; }
+h2, h3, h4 { font-family: var(--f-titulo); line-height: 1.2; break-after: avoid; text-wrap: balance; }
+h2 { font-size: 19pt; font-weight: 600; letter-spacing: -.02em; margin: 0 0 10pt; padding-bottom: 6pt; border-bottom: 1.5pt solid var(--tinta); }
+h3 { font-size: 12.5pt; font-weight: 600; margin: 16pt 0 6pt; }
+h4 { font-size: 10.5pt; font-weight: 600; margin: 14pt 0 4pt; }
+p { margin: 0 0 7pt; orphans: 3; widows: 3; text-align: justify; hyphens: auto; }
+ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+li { margin-bottom: 3pt; }
+strong { font-weight: 600; }
+sup.cit { font-size: 7pt; color: var(--menta); }
+.mono { font-family: var(--f-num); font-size: .9em; }
+section { break-before: page; }
+section.capa { break-before: auto; }
+section#s1 { break-before: auto; }
+section#refs { break-before: auto; margin-top: 18pt; }
+section#s5, section#s6, section#s7 { break-before: auto; margin-top: 22pt; }
+.formula { font-family: var(--f-num); background: var(--suave); border-radius: 6pt; padding: 8pt 11pt; margin: 6pt 0 9pt; font-size: 9.5pt; break-inside: avoid; }
+.barra { display: inline-block; width: 1.4pt; height: 1.05em; background: var(--laranja); vertical-align: -.15em; margin: 0 1.5pt; }
+.d { color: #9aa3ae; text-decoration: line-through; text-decoration-color: var(--laranja); }
+figure { margin: 8pt 0 11pt; break-inside: avoid; }
+figcaption { font-size: 8pt; color: var(--tinta-2); margin-top: 4pt; }
+figure.tabela table { width: 100%; border-collapse: collapse; font-size: 8.2pt; font-variant-numeric: tabular-nums; }
+figure.tabela th { text-align: left; font-weight: 600; color: var(--tinta-2); font-size: 7.6pt; border-bottom: 1pt solid var(--tinta); padding: 4pt 6pt; }
+figure.tabela td { border-bottom: .5pt solid var(--linha); padding: 4pt 6pt; vertical-align: top; }
+figure.tabela td b.mono { color: var(--menta); }
+figure.tabela.pequena table { font-size: 7.4pt; } figure.tabela.pequena td, figure.tabela.pequena th { padding: 3pt 4pt; }
+figure.tabela.estreita table { width: auto; min-width: 60%; }
+figure.codigo { border-radius: 7pt; overflow: hidden; background: #0d1117; border: .6pt solid #30363d; }
+figure.codigo figcaption { margin: 0; font-family: var(--f-num); font-size: 7pt; color: #8b949e; padding: 5pt 10pt; background: #161b22; border-bottom: .6pt solid #30363d; display: flex; gap: 6pt; align-items: center; }
+figure.codigo figcaption::before { content: ""; width: 26pt; height: 6pt; flex: none;
+  background: radial-gradient(circle at 3pt 3pt, #ff5f57 2.6pt, transparent 3pt), radial-gradient(circle at 12.5pt 3pt, #febc2e 2.6pt, transparent 3pt), radial-gradient(circle at 22pt 3pt, #28c840 2.6pt, transparent 3pt); }
+figure.codigo pre { margin: 0; padding: 9pt 11pt; font-family: var(--f-num); font-size: 7.3pt; line-height: 1.5; color: #e6edf3; white-space: pre-wrap; word-break: break-word; }
+figure.codigo .highlight { background: none; }
+figure.terminal pre { color: #c9d1d9; }
+figure.imagem img { width: 100%; border-radius: 7pt; border: .6pt solid var(--linha); display: block; }
+figure.imagem.estreita img { width: 50%; margin: 0 auto; }
+figure.imagem.estreita figcaption { text-align: center; }
+figure.grafico svg { width: 100%; height: auto; display: block; }
+.legenda { display: flex; gap: 14pt; font-size: 8pt; color: var(--tinta-2); margin-bottom: 2pt; }
+.legenda i { display: inline-block; width: 12pt; height: 2.5pt; border-radius: 2pt; vertical-align: 2.5pt; margin-right: 5pt; }
+ol.conclusoes li { margin-bottom: 6pt; }
+ol.referencias { font-size: 9pt; } ol.referencias li { margin-bottom: 5pt; text-align: left; }
+.sumario ol { font-family: var(--f-titulo); font-size: 13pt; padding-left: 18pt; } .sumario li { margin-bottom: 5pt; }
+.ref-sumario { font-family: var(--f-titulo); font-size: 13pt; margin-left: 18pt; }
+h2.sem-numero { border-bottom: 1.5pt solid var(--tinta); }
+.sumario { margin-bottom: 26pt; }
+
+/* capa escura, com a identidade visual da calculadora */
+.capa { height: 297mm; background: #0b0c0f; color: #eef1f4; padding: 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
+.capa-topo { display: flex; gap: 12pt; align-items: center; font-size: 9pt; color: #9ba3b1; }
+.capa-topo p { margin: 0; text-align: left; }
+.logo { width: 34pt; height: 34pt; border-radius: 10pt; background: linear-gradient(135deg, #4cf0b0, #a6f39a 55%, #d6f57c); flex: none; }
+.capa-rotulo { color: #4cf0b0; font-size: 10pt; margin-bottom: 8pt; text-align: left; }
+.capa h1 { font-family: var(--f-titulo); font-size: 46pt; font-weight: 600; letter-spacing: -.035em; line-height: 1; margin: 0 0 12pt; }
+.capa-sub { font-size: 14pt; color: #c9d0da; max-width: 120mm; text-align: left; }
+.capa-corte { margin-top: 26pt; font-family: var(--f-num); font-size: 17pt; font-weight: 300; color: #eef1f4; }
+.capa-corte .k { color: #eef1f4; } .capa-corte .d { color: #5c6471; text-decoration: line-through; text-decoration-color: #ff8a4c; }
+.capa-corte .barra { background: #ff8a4c; width: 2pt; } .capa-corte .seta, .capa-corte .ou { color: #5c6471; margin: 0 6pt; }
+.capa-base { display: grid; grid-template-columns: 1fr 1.5fr .8fr; gap: 14pt; border-top: .6pt solid #262a31; padding-top: 14pt; }
+.capa-base p { margin: 2pt 0 8pt; font-size: 10pt; text-align: left; }
+.capa-base .rot { font-size: 8pt; color: #5c6471; }
+</style></head>
+<body>
+<!-- Gerado automaticamente a partir do simulador.py (números e trechos de código reais). -->
+
+<section class="capa">
+  <div class="capa-topo">
+    <span class="logo"></span>
+    <div><p>Fundação Universidade Federal do Vale do São Francisco</p><p>Disciplina de Cálculo Numérico · Projeto Unidade 1 (Erros) · 2026.2</p></div>
+  </div>
+  <div class="capa-meio">
+    <p class="capa-rotulo">Relatório final · Atividade Prática 1</p>
+    <h1>Calculadora de Erros</h1>
+    <p class="capa-sub">Simulador de propagação de erros numéricos com truncamento e arredondamento</p>
+    <div class="capa-corte"><span class="k">0.1135</span><span class="barra"></span><span class="d">72</span> × 10¹ <span class="seta">→</span> 1.135 <span class="ou">ou</span> 1.136</div>
+  </div>
+  <div class="capa-base">
+    <div><span class="rot">Equipe</span><p>Glauco Erasmo<br>Cristiana Campinho<br>Alexandre Macedo</p></div>
+    <div><span class="rot">Calculadora online</span><p>glaucoe18.github.io/simulador-erros-numericos/</p><span class="rot">Código-fonte</span><p>github.com/GlaucoE18/simulador-erros-numericos</p></div>
+    <div><span class="rot">Data</span><p>Outubro de 2026</p></div>
+  </div>
+</section>
+
+<section class="sumario">
+  <h2 class="sem-numero">Sumário</h2>
+  <ol>
+    <li><a href="#s1">Introdução</a></li>
+    <li><a href="#s2">Fundamentação teórica</a></li>
+    <li><a href="#s3">O programa</a></li>
+    <li><a href="#s4">Testes e resultados</a></li>
+    <li><a href="#s5">Análise crítica</a></li>
+    <li><a href="#s6">Conclusões</a></li>
+    <li><a href="#s7">Participação da equipe</a></li>
+  </ol>
+  <p class="ref-sumario"><a href="#refs">Referências</a></p>
+</section>
+
+<section id="s1">
+<h2>1. Introdução</h2>
+<p>Este relatório apresenta a <strong>Calculadora de Erros</strong>, o simulador desenvolvido pela equipe para a
+Atividade Prática 1 da disciplina. O programa funciona como uma calculadora de precisão limitada: ele imita uma
+máquina hipotética que guarda apenas <em>n</em> dígitos significativos e mostra, para cada operação, o valor exato,
+o valor aproximado e os erros absoluto e relativo, usando <strong>truncamento</strong> ou <strong>arredondamento</strong>.</p>
+<p>Os objetivos, conforme o roteiro, foram:</p>
+<ul>
+  <li>compreender e diferenciar erro de truncamento e erro de arredondamento;</li>
+  <li>implementar as quatro operações aritméticas com precisão controlada;</li>
+  <li>analisar como a precisão finita afeta cálculos sequenciais;</li>
+  <li>calcular e interpretar o erro absoluto e o erro relativo;</li>
+  <li>observar a propagação de erros e o cancelamento subtrativo.</li>
+</ul>
+<p>O trabalho tem três entregas: o <strong>código-fonte</strong> no GitHub (<span class="mono">https://github.com/GlaucoE18/simulador-erros-numericos</span>), a <strong>calculadora
+online</strong> (<span class="mono">https://glaucoe18.github.io/simulador-erros-numericos/</span>), que roda o mesmo código no navegador, e este <strong>relatório</strong>.</p>
+</section>
+
+<section id="s2">
+<h2>2. Fundamentação teórica</h2>
+<h3>2.1 Sistema de ponto flutuante</h3>
+<p>Um computador representa números reais num sistema de ponto flutuante F(β, t, m, M), em que β é a base, t é a
+quantidade de dígitos da mantissa e o expoente e varia entre −m e M. Todo número diferente de zero é escrito na
+<strong>forma normalizada</strong>:</p>
+<div class="formula">x = ± 0.d₁d₂…dₜ × βᵉ,   com d₁ ≠ 0</div>
+<p>Na máquina hipotética do roteiro, β = 10 e t = 4. O exemplo do enunciado, 123.45, fica 0.12345 × 10³. Como só
+cabem 4 dígitos na mantissa, o último dígito (5) não pode ser guardado. A máquina precisa decidir o que fazer com ele.</p>
+
+<h3>2.2 Truncamento e arredondamento</h3>
+<p>No <strong>truncamento</strong>, os dígitos que excedem t são simplesmente descartados. No <strong>arredondamento</strong>,
+olha-se o primeiro dígito descartado: se ele for maior ou igual a 5, soma-se 1 ao último dígito guardado. Com t = 4:</p>
+<div class="formula">1.13572 = 0.1135<span class="barra"></span><span class="d">72</span> × 10¹   →   truncamento: 1.135   ·   arredondamento: 1.136</div>
+<p>Para um número de expoente e, o último dígito guardado vale 10<sup>e−t</sup>. O erro do truncamento é sempre
+menor que essa unidade, e sempre para o mesmo lado (em direção ao zero). O do arredondamento é no máximo metade dela.
+Em termos relativos, isso dá os limites clássicos<sup class="cit">[1]</sup>:</p>
+<figure class="tabela estreita"><table><thead><tr><th></th><th>Limite do erro relativo</th><th>Com t = 4</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">&lt; 10^(1−t)</span></td><td><span class="mono">&lt; 0.001 = 0.1%</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">≤ ½ · 10^(1−t)</span></td><td><span class="mono">≤ 0.0005 = 0.05%</span></td></tr></tbody></table></figure>
+
+<h3>2.3 Erro absoluto e erro relativo</h3>
+<p>Seguindo o roteiro, para cada operação calculamos:</p>
+<div class="formula">Ea = |valor exato − valor aproximado|        Er = Ea / |valor aproximado|</div>
+<p>O erro absoluto mede o tamanho do erro na mesma unidade do resultado. O relativo mede o erro em proporção ao
+resultado, e por isso permite comparar contas de tamanhos diferentes.</p>
+
+<h3>2.4 Propagação e cancelamento subtrativo</h3>
+<p>Quando as contas são feitas em sequência, o resultado arredondado de uma etapa é a entrada da etapa seguinte. Os
+erros não desaparecem: eles se <strong>propagam</strong> e se acumulam. Um caso especialmente ruim é a subtração
+de dois números muito próximos. Os dígitos iguais se cancelam, e os poucos dígitos que sobram são justamente os que
+carregavam o erro. É o <strong>cancelamento subtrativo</strong>: um erro pequeno nos operandos vira um erro relativo
+grande no resultado<sup class="cit">[1, 3]</sup>.</p>
+</section>
+
+<section id="s3">
+<h2>3. O programa</h2>
+<h3>3.1 O que ele faz</h3>
+<p>O simulador recebe como entrada:</p>
+<ul>
+  <li>dois números <em>x</em> e <em>y</em> (aceita vírgula ou ponto e notação como 4e-5);</li>
+  <li>a operação (+, −, ×, ÷);</li>
+  <li>o número de dígitos <em>n</em> que a máquina guarda (de 1 a 15);</li>
+  <li>o método (truncamento ou arredondamento).</li>
+</ul>
+<p>Como opções extras, a critério da equipe, também é possível escolher:</p>
+<ul>
+  <li>se <em>n</em> conta <strong>dígitos significativos</strong> (o padrão) ou <strong>casas decimais</strong>;</li>
+  <li>se <em>x</em> e <em>y</em> também são guardados com <em>n</em> dígitos antes da conta.</li>
+</ul>
+<p>Para cada operação o programa faz cinco etapas:</p>
+<ol>
+  <li>calcula o <strong>valor exato</strong> com 50 dígitos de precisão;</li>
+  <li>guarda x e y com n dígitos (como pede o Exemplo 2);</li>
+  <li>faz a conta com os valores guardados;</li>
+  <li><strong>normaliza</strong> o resultado (0.d₁d₂… × 10ᵉ) e o corta em n dígitos, por truncamento ou arredondamento;</li>
+  <li>calcula <strong>Ea</strong> e <strong>Er</strong>.</li>
+</ol>
+<p>Ele também simula somas sucessivas (Exemplo 3) com qualquer parcela e quantidade, e traz os exemplos do roteiro e
+os testes extras prontos.</p>
+
+<h3>3.2 Como executar</h3>
+<p><strong>Online, sem instalar nada:</strong> abrir <span class="mono">https://glaucoe18.github.io/simulador-erros-numericos/</span>. A página carrega o Python dentro do navegador e
+executa o próprio <span class="mono">simulador.py</span>; na primeira vez isso leva alguns segundos.</p>
+<p><strong>No terminal</strong>, só com o Python 3.10 ou mais novo (nenhuma biblioteca extra):</p>
+<figure class="codigo terminal"><figcaption>terminal</figcaption><div class="codigo-corpo"><pre>$ git clone https://github.com/GlaucoE18/simulador-erros-numericos
+$ cd simulador-erros-numericos
+$ python simulador.py            # menu interativo
+$ python simulador.py --testes   # imprime todos os testes deste relatório</pre></div></figure>
+<p>O menu tem as opções de nova operação, os três exemplos do roteiro, somas sucessivas personalizadas, rodar todos
+os testes e <strong>0) Sair</strong>. Depois de cada cálculo ele pergunta se a pessoa quer fazer outro, então
+<strong>é possível fazer novos testes sem reiniciar o programa</strong>, como pede o roteiro. Para rodar a página
+web localmente: <span class="mono">python -m http.server 8000</span> e abrir <span class="mono">http://localhost:8000</span>.</p>
+
+<h3>3.3 Organização do código</h3>
+<p>A regra principal do projeto é que <strong>toda a matemática fica num único arquivo</strong>, o
+<span class="mono">simulador.py</span>. O menu do terminal e a página web chamam as mesmas funções, e por isso os dois
+dão exatamente os mesmos números.</p>
+<figure class="tabela estreita"><table><thead><tr><th>Arquivo</th><th>O que contém</th></tr></thead><tbody><tr><td><span class="mono">simulador.py</span></td><td>Toda a matemática, o menu do terminal e a ponte com a página (9 partes)</td></tr><tr><td><span class="mono">index.html</span></td><td>A estrutura da página (o que aparece na tela)</td></tr><tr><td><span class="mono">estilo.css</span></td><td>O visual da página</td></tr><tr><td><span class="mono">interface.js</span></td><td>Teclado, passo a passo e abas. Não faz contas: chama o simulador.py</td></tr><tr><td><span class="mono">icones.js</span></td><td>Os desenhos dos ícones</td></tr></tbody></table></figure>
+<figure class="tabela "><table><thead><tr><th>Parte</th><th>Conteúdo</th><th>Funções principais</th></tr></thead><tbody><tr><td>1</td><td>Configurações (precisão de 50 dígitos, métodos e modos)</td><td>—</td></tr><tr><td>2</td><td>Leitura dos números digitados</td><td><span class="mono">ler_numero</span></td></tr><tr><td>3</td><td>Ponto flutuante: normalização, truncamento e arredondamento</td><td><span class="mono">normalizar, ajustar</span></td></tr><tr><td>4</td><td>Operações e cálculo dos erros</td><td><span class="mono">operar, calcular_erros</span></td></tr><tr><td>5</td><td>Simulações completas</td><td><span class="mono">simular_operacao, simular_somas_sucessivas</span></td></tr><tr><td>6</td><td>Exemplos do roteiro e testes extras</td><td><span class="mono">exemplo_1, exemplo_2, exemplo_3, …</span></td></tr><tr><td>7</td><td>Formatação para exibir</td><td><span class="mono">formatar, formatar_cientifico, separar_corte</span></td></tr><tr><td>8</td><td>Menu interativo do terminal</td><td><span class="mono">menu</span></td></tr><tr><td>9</td><td>Ponte com a página web</td><td><span class="mono">tela_operacao, tela_somas, tela_exemplos</span></td></tr></tbody></table><figcaption>As nove partes do simulador.py.</figcaption></figure>
+
+<h3>3.4 As funções principais</h3>
+<p>Os trechos abaixo foram copiados do código atual (as docstrings, que explicam cada função no arquivo, foram
+omitidas para economizar espaço).</p>
+
+<h4><span class="mono">ajustar()</span>: a máquina de n dígitos</h4>
+<p>É o coração do trabalho. A função calcula a posição do último dígito que a máquina mantém
+(<span class="mono">posicao_ultimo</span>) e corta o número nessa posição com <span class="mono">Decimal.quantize</span>.
+Com <span class="mono">ROUND_DOWN</span> o corte é um truncamento; com <span class="mono">ROUND_HALF_UP</span>, um
+arredondamento. Para 1.13572 com n = 4, o primeiro dígito está em 10⁰, então o último que fica está em 10⁻³, e o
+número vira 1.135 ou 1.136. O <span class="mono">if</span> interno trata um caso raro: arredondar 9.9996 dá 10.000
+(5 dígitos), e a função refaz o corte uma casa acima para obter 10.00.</p>
+<figure class="codigo"><figcaption>simulador.py · linhas 195–251 (docstring omitida)</figcaption><div class="codigo-corpo"><div class="highlight"><pre style="line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">ajustar</span><span style="color: #E6EDF3">(valor,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #E6EDF3">SIGNIFICATIVOS):</span>
+    <span style="color: #E6EDF3">_validar(n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo)</span>
+    <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">valor</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #A5D6FF">0</span><span style="color: #E6EDF3">:</span>
+        <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">Decimal(</span><span style="color: #A5D6FF">0</span><span style="color: #E6EDF3">)</span>
+
+    <span style="color: #E6EDF3">regra</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ROUND_DOWN</span> <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">metodo</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #E6EDF3">TRUNCAMENTO</span> <span style="color: #FF7B72">else</span> <span style="color: #E6EDF3">ROUND_HALF_UP</span>
+
+    <span style="color: #FF7B72">try</span><span style="color: #E6EDF3">:</span>
+        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">modo</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #E6EDF3">SIGNIFICATIVOS:</span>
+            <span style="color: #8B949E; font-style: italic"># Potência de 10 do ÚLTIMO dígito que a máquina mantém.</span>
+            <span style="color: #8B949E; font-style: italic"># Ex.: 1.13572 tem o 1º dígito em 10^0; com n = 4 o último</span>
+            <span style="color: #8B949E; font-style: italic"># dígito mantido fica em 10^(0 - 3) = 10^-3  -&gt;  1.135</span>
+            <span style="color: #E6EDF3">posicao_ultimo</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">valor</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">adjusted()</span> <span style="color: #FF7B72; font-weight: bold">-</span> <span style="color: #E6EDF3">(n</span> <span style="color: #FF7B72; font-weight: bold">-</span> <span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">)</span>
+            <span style="color: #E6EDF3">resultado</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">valor</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">quantize(Decimal(</span><span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">)</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">scaleb(posicao_ultimo),</span> <span style="color: #E6EDF3">rounding</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #E6EDF3">regra)</span>
+
+            <span style="color: #8B949E; font-style: italic"># Caso especial do arredondamento: 9.9996 com n = 4 vira 10.000,</span>
+            <span style="color: #8B949E; font-style: italic"># que tem 5 dígitos (o número "subiu" de 0.9999×10^1 para</span>
+            <span style="color: #8B949E; font-style: italic"># 0.1000×10^2). Refazemos o ajuste uma casa acima para voltar a</span>
+            <span style="color: #8B949E; font-style: italic"># ter exatamente n dígitos: 10.00. O valor não muda, só a forma.</span>
+            <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">resultado</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">adjusted()</span> <span style="color: #FF7B72; font-weight: bold">&gt;</span> <span style="color: #E6EDF3">valor</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">adjusted():</span>
+                <span style="color: #E6EDF3">resultado</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">resultado</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">quantize(Decimal(</span><span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">)</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">scaleb(posicao_ultimo</span> <span style="color: #FF7B72; font-weight: bold">+</span> <span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">),</span> <span style="color: #E6EDF3">rounding</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #E6EDF3">regra)</span>
+        <span style="color: #FF7B72">else</span><span style="color: #E6EDF3">:</span>
+            <span style="color: #8B949E; font-style: italic"># Modo casas decimais: o último dígito mantido fica sempre em 10^-n.</span>
+            <span style="color: #E6EDF3">resultado</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">valor</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">quantize(Decimal(</span><span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">)</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">scaleb(</span><span style="color: #FF7B72; font-weight: bold">-</span><span style="color: #E6EDF3">n),</span> <span style="color: #E6EDF3">rounding</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #E6EDF3">regra)</span>
+    <span style="color: #FF7B72">except</span> <span style="color: #E6EDF3">InvalidOperation:</span>
+        <span style="color: #8B949E; font-style: italic"># Acontece se o número for gigantesco para a precisão de 50 dígitos.</span>
+        <span style="color: #FF7B72">raise</span> <span style="color: #F0883E; font-weight: bold">ValueError</span><span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Número grande demais para essa configuração de precisão."</span><span style="color: #E6EDF3">)</span> <span style="color: #FF7B72">from</span><span style="color: #6E7681"> </span><span style="color: #79C0FF">None</span>
+
+    <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">resultado</span>
+</pre></div>
+</div></figure>
+
+<h4><span class="mono">calcular_erros()</span>: as fórmulas do roteiro</h4>
+<p>Aplica Ea = |exato − aprox| e Er = Ea / |aprox|. Quando o aproximado é 0, Er não existe (seria divisão por zero);
+a função devolve <span class="mono">None</span> e as interfaces mostram "indefinido". Ela também calcula o erro
+relativo em relação ao exato, usado na análise da seção 5.</p>
+<figure class="codigo"><figcaption>simulador.py · linhas 276–301 (docstring omitida)</figcaption><div class="codigo-corpo"><div class="highlight"><pre style="line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">calcular_erros</span><span style="color: #E6EDF3">(exato,</span> <span style="color: #E6EDF3">aproximado):</span>
+    <span style="color: #E6EDF3">absoluto</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">abs(exato</span> <span style="color: #FF7B72; font-weight: bold">-</span> <span style="color: #E6EDF3">aproximado)</span>
+    <span style="color: #E6EDF3">relativo</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">absoluto</span> <span style="color: #FF7B72; font-weight: bold">/</span> <span style="color: #E6EDF3">abs(aproximado)</span> <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">aproximado</span> <span style="color: #FF7B72; font-weight: bold">!=</span> <span style="color: #A5D6FF">0</span> <span style="color: #FF7B72">else</span> <span style="color: #79C0FF">None</span>
+    <span style="color: #E6EDF3">relativo_exato</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">absoluto</span> <span style="color: #FF7B72; font-weight: bold">/</span> <span style="color: #E6EDF3">abs(exato)</span> <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">exato</span> <span style="color: #FF7B72; font-weight: bold">!=</span> <span style="color: #A5D6FF">0</span> <span style="color: #FF7B72">else</span> <span style="color: #79C0FF">None</span>
+    <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">{</span>
+        <span style="color: #A5D6FF">"absoluto"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">absoluto,</span>
+        <span style="color: #A5D6FF">"relativo"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">relativo,</span>
+        <span style="color: #A5D6FF">"percentual"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">relativo</span> <span style="color: #FF7B72; font-weight: bold">*</span> <span style="color: #A5D6FF">100</span> <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">relativo</span> <span style="color: #FF7B72; font-weight: bold">is</span> <span style="color: #FF7B72; font-weight: bold">not</span> <span style="color: #79C0FF">None</span> <span style="color: #FF7B72">else</span> <span style="color: #79C0FF">None</span><span style="color: #E6EDF3">,</span>
+        <span style="color: #A5D6FF">"relativo_exato"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">relativo_exato,</span>
+    <span style="color: #E6EDF3">}</span>
+</pre></div>
+</div></figure>
+
+<h4><span class="mono">simular_operacao()</span>: as cinco etapas</h4>
+<p>Junta tudo na ordem do roteiro e devolve um dicionário com cada etapa. É esse dicionário que o terminal imprime e
+que a página desenha.</p>
+<figure class="codigo"><figcaption>simulador.py · linhas 320–369 (docstring omitida)</figcaption><div class="codigo-corpo"><div class="highlight"><pre style="line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">simular_operacao</span><span style="color: #E6EDF3">(x,</span> <span style="color: #E6EDF3">y,</span> <span style="color: #E6EDF3">op,</span> <span style="color: #E6EDF3">n</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #A5D6FF">4</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">metodo</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #E6EDF3">ARREDONDAMENTO,</span> <span style="color: #E6EDF3">modo</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #E6EDF3">SIGNIFICATIVOS,</span>
+                     <span style="color: #E6EDF3">ajustar_operandos</span><span style="color: #FF7B72; font-weight: bold">=</span><span style="color: #79C0FF">True</span><span style="color: #E6EDF3">):</span>
+    <span style="color: #E6EDF3">x,</span> <span style="color: #E6EDF3">y</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ler_numero(x),</span> <span style="color: #E6EDF3">ler_numero(y)</span>
+    <span style="color: #E6EDF3">op</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">padronizar_operacao(op)</span>
+    <span style="color: #E6EDF3">_validar(n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo)</span>
+
+    <span style="color: #E6EDF3">exato</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">operar(x,</span> <span style="color: #E6EDF3">y,</span> <span style="color: #E6EDF3">op)</span>                                   <span style="color: #8B949E; font-style: italic"># etapa 1</span>
+
+    <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">ajustar_operandos:</span>                                      <span style="color: #8B949E; font-style: italic"># etapa 2</span>
+        <span style="color: #E6EDF3">x_maquina</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ajustar(x,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo)</span>
+        <span style="color: #E6EDF3">y_maquina</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ajustar(y,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo)</span>
+    <span style="color: #FF7B72">else</span><span style="color: #E6EDF3">:</span>
+        <span style="color: #E6EDF3">x_maquina,</span> <span style="color: #E6EDF3">y_maquina</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">x,</span> <span style="color: #E6EDF3">y</span>
+
+    <span style="color: #8B949E; font-style: italic"># Caso raro: no modo casas decimais, um y muito pequeno (ex.: 0.00004 com</span>
+    <span style="color: #8B949E; font-style: italic"># 4 casas) vira 0 dentro da máquina, e aí a máquina não consegue dividir.</span>
+    <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">op</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #A5D6FF">"/"</span> <span style="color: #FF7B72; font-weight: bold">and</span> <span style="color: #E6EDF3">y_maquina</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #A5D6FF">0</span><span style="color: #E6EDF3">:</span>
+        <span style="color: #FF7B72">raise</span> <span style="color: #F0883E; font-weight: bold">ZeroDivisionError</span><span style="color: #E6EDF3">(</span>
+            <span style="color: #79C0FF">f</span><span style="color: #A5D6FF">"y = {</span><span style="color: #E6EDF3">formatar(y)</span><span style="color: #A5D6FF">} vira 0 quando guardado com {</span><span style="color: #E6EDF3">descrever_precisao(n,</span><span style="color: #6E7681"> </span><span style="color: #E6EDF3">modo)</span><span style="color: #A5D6FF">}, "</span>
+            <span style="color: #A5D6FF">"e a máquina não consegue dividir por zero."</span><span style="color: #E6EDF3">)</span>
+
+    <span style="color: #E6EDF3">resultado_bruto</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">operar(x_maquina,</span> <span style="color: #E6EDF3">y_maquina,</span> <span style="color: #E6EDF3">op)</span>         <span style="color: #8B949E; font-style: italic"># etapa 3</span>
+    <span style="color: #E6EDF3">aproximado</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ajustar(resultado_bruto,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo)</span>     <span style="color: #8B949E; font-style: italic"># etapa 4</span>
+    <span style="color: #E6EDF3">erros</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">calcular_erros(exato,</span> <span style="color: #E6EDF3">aproximado)</span>                  <span style="color: #8B949E; font-style: italic"># etapa 5</span>
+
+    <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">{</span>
+        <span style="color: #A5D6FF">"x"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">x,</span> <span style="color: #A5D6FF">"y"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">y,</span> <span style="color: #A5D6FF">"op"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">op,</span> <span style="color: #A5D6FF">"n"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">n,</span> <span style="color: #A5D6FF">"metodo"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #A5D6FF">"modo"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">modo,</span>
+        <span style="color: #A5D6FF">"ajustar_operandos"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">ajustar_operandos,</span>
+        <span style="color: #A5D6FF">"exato"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">exato,</span>
+        <span style="color: #A5D6FF">"x_maquina"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">x_maquina,</span>
+        <span style="color: #A5D6FF">"y_maquina"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">y_maquina,</span>
+        <span style="color: #A5D6FF">"resultado_bruto"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">resultado_bruto,</span>
+        <span style="color: #A5D6FF">"aproximado"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">aproximado,</span>
+        <span style="color: #A5D6FF">"erros"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">erros,</span>
+        <span style="color: #8B949E; font-style: italic"># Curiosidade: a mesma conta feita com float (double). Mostra que a</span>
+        <span style="color: #8B949E; font-style: italic"># "precisão máxima" do float também tem erro de representação.</span>
+        <span style="color: #A5D6FF">"resultado_float"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">_operar_float(x,</span> <span style="color: #E6EDF3">y,</span> <span style="color: #E6EDF3">op),</span>
+    <span style="color: #E6EDF3">}</span>
+</pre></div>
+</div></figure>
+
+<h4><span class="mono">simular_somas_sucessivas()</span>: a propagação do erro</h4>
+<p>O laço soma a parcela ao valor acumulado, corta o resultado em n dígitos e guarda cada passo. O valor cortado é o
+que entra na soma seguinte, e é assim que o erro de um passo passa para o próximo.</p>
+<figure class="codigo"><figcaption>simulador.py · linhas 425–438</figcaption><div class="codigo-corpo"><div class="highlight"><pre style="line-height: 125%;"><span></span>    <span style="color: #E6EDF3">passos</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
+    <span style="color: #FF7B72">for</span> <span style="color: #E6EDF3">i</span> <span style="color: #FF7B72; font-weight: bold">in</span> <span style="color: #E6EDF3">range(</span><span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">numero_de_somas</span> <span style="color: #FF7B72; font-weight: bold">+</span> <span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">):</span>
+        <span style="color: #E6EDF3">anterior</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">acumulado</span>
+        <span style="color: #E6EDF3">soma_bruta</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">anterior</span> <span style="color: #FF7B72; font-weight: bold">+</span> <span style="color: #E6EDF3">parcela_maquina</span>           <span style="color: #8B949E; font-style: italic"># conta feita pela máquina</span>
+        <span style="color: #E6EDF3">acumulado</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ajustar(soma_bruta,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo)</span>  <span style="color: #8B949E; font-style: italic"># máquina guarda só n dígitos</span>
+        <span style="color: #E6EDF3">exato</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">exato</span> <span style="color: #FF7B72; font-weight: bold">+</span> <span style="color: #E6EDF3">parcela</span>                           <span style="color: #8B949E; font-style: italic"># o que deveria dar</span>
+        <span style="color: #E6EDF3">passos</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append({</span>
+            <span style="color: #A5D6FF">"passo"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">i,</span>
+            <span style="color: #A5D6FF">"anterior"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">anterior,</span>
+            <span style="color: #A5D6FF">"parcela"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">parcela_maquina,</span>
+            <span style="color: #A5D6FF">"soma_bruta"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">soma_bruta,</span>
+            <span style="color: #A5D6FF">"armazenado"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">acumulado,</span>
+            <span style="color: #A5D6FF">"exato"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">exato,</span>
+            <span style="color: #A5D6FF">"erro_absoluto"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">abs(exato</span> <span style="color: #FF7B72; font-weight: bold">-</span> <span style="color: #E6EDF3">acumulado),</span>
+</pre></div>
+</div></figure>
+
+<h4><span class="mono">menu()</span>: novos cálculos ou sair</h4>
+<p>O laço <span class="mono">while True</span> mostra o menu até a pessoa digitar 0. Cada opção chama uma função e
+volta para o menu.</p>
+<figure class="codigo"><figcaption>simulador.py · linhas 956–978 (docstring omitida)</figcaption><div class="codigo-corpo"><div class="highlight"><pre style="line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">menu</span><span style="color: #E6EDF3">():</span>
+    <span style="color: #E6EDF3">opcoes</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">{</span>
+        <span style="color: #A5D6FF">"1"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Nova operação (você escolhe x, y, operação, n e método)"</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">_opcao_nova_operacao),</span>
+        <span style="color: #A5D6FF">"2"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Exemplo 1 - Soma simples (truncamento x arredondamento)"</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">_opcao_exemplo_1),</span>
+        <span style="color: #A5D6FF">"3"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Exemplo 2 - Cancelamento subtrativo"</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">_opcao_exemplo_2),</span>
+        <span style="color: #A5D6FF">"4"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Exemplo 3 - Propagação do erro em 10 somas"</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">_opcao_exemplo_3),</span>
+        <span style="color: #A5D6FF">"5"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Somas sucessivas personalizadas"</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">_opcao_somas_personalizadas),</span>
+        <span style="color: #A5D6FF">"6"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">"Rodar todos os testes do relatório"</span><span style="color: #E6EDF3">,</span> <span style="color: #E6EDF3">_opcao_rodar_tudo),</span>
+    <span style="color: #E6EDF3">}</span>
+    <span style="color: #FF7B72">while</span> <span style="color: #79C0FF">True</span><span style="color: #E6EDF3">:</span>
+        <span style="color: #E6EDF3">_titulo(</span><span style="color: #A5D6FF">"Calculadora de Erros - Simulador de Propagação de Erros Numéricos"</span><span style="color: #E6EDF3">)</span>
+        <span style="color: #FF7B72">for</span> <span style="color: #E6EDF3">chave,</span> <span style="color: #E6EDF3">(descricao,</span> <span style="color: #E6EDF3">_)</span> <span style="color: #FF7B72; font-weight: bold">in</span> <span style="color: #E6EDF3">opcoes</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">items():</span>
+            <span style="color: #E6EDF3">print(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">"  {</span><span style="color: #E6EDF3">chave</span><span style="color: #A5D6FF">}) {</span><span style="color: #E6EDF3">descricao</span><span style="color: #A5D6FF">}"</span><span style="color: #E6EDF3">)</span>
+        <span style="color: #E6EDF3">print(</span><span style="color: #A5D6FF">"  0) Sair"</span><span style="color: #E6EDF3">)</span>
+        <span style="color: #E6EDF3">escolha</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">input(</span><span style="color: #A5D6FF">"</span><span style="color: #79C0FF">\n</span><span style="color: #A5D6FF">  Escolha uma opção: "</span><span style="color: #E6EDF3">)</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">strip()</span>
+        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">escolha</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #A5D6FF">"0"</span><span style="color: #E6EDF3">:</span>
+            <span style="color: #E6EDF3">print(</span><span style="color: #A5D6FF">"</span><span style="color: #79C0FF">\n</span><span style="color: #A5D6FF">  Até a próxima!</span><span style="color: #79C0FF">\n</span><span style="color: #A5D6FF">"</span><span style="color: #E6EDF3">)</span>
+            <span style="color: #FF7B72">return</span>
+        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">escolha</span> <span style="color: #FF7B72; font-weight: bold">in</span> <span style="color: #E6EDF3">opcoes:</span>
+            <span style="color: #E6EDF3">opcoes[escolha][</span><span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">]()</span>
+        <span style="color: #FF7B72">else</span><span style="color: #E6EDF3">:</span>
+            <span style="color: #E6EDF3">print(</span><span style="color: #A5D6FF">"  [!] Opção inválida. Digite um número do menu."</span><span style="color: #E6EDF3">)</span>
+</pre></div>
+</div></figure>
+
+<h4><span class="mono">tela_operacao()</span>: a ponte com a página</h4>
+<p>A página web executa o <span class="mono">simulador.py</span> dentro do navegador com o Pyodide, uma versão do
+Python feita para rodar em páginas web<sup class="cit">[6]</sup>. O JavaScript não faz conta nenhuma: ele chama esta
+função, que roda a operação com o método escolhido e com o outro (para a tabela de comparação), e recebe os
+números já formatados em JSON.</p>
+<figure class="codigo"><figcaption>simulador.py · linhas 1032–1047 (docstring omitida)</figcaption><div class="codigo-corpo"><div class="highlight"><pre style="line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">tela_operacao</span><span style="color: #E6EDF3">(x,</span> <span style="color: #E6EDF3">y,</span> <span style="color: #E6EDF3">op,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo,</span> <span style="color: #E6EDF3">ajustar_operandos):</span>
+    <span style="color: #FF7B72">try</span><span style="color: #E6EDF3">:</span>
+        <span style="color: #E6EDF3">n</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">int(n)</span>
+        <span style="color: #E6EDF3">r</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">simular_operacao(x,</span> <span style="color: #E6EDF3">y,</span> <span style="color: #E6EDF3">op,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">metodo,</span> <span style="color: #E6EDF3">modo,</span> <span style="color: #E6EDF3">bool(ajustar_operandos))</span>
+        <span style="color: #E6EDF3">outro</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">ARREDONDAMENTO</span> <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">metodo</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #E6EDF3">TRUNCAMENTO</span> <span style="color: #FF7B72">else</span> <span style="color: #E6EDF3">TRUNCAMENTO</span>
+        <span style="color: #E6EDF3">r_outro</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">simular_operacao(x,</span> <span style="color: #E6EDF3">y,</span> <span style="color: #E6EDF3">op,</span> <span style="color: #E6EDF3">n,</span> <span style="color: #E6EDF3">outro,</span> <span style="color: #E6EDF3">modo,</span> <span style="color: #E6EDF3">bool(ajustar_operandos))</span>
+        <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">json</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">dumps({</span><span style="color: #A5D6FF">"ok"</span><span style="color: #E6EDF3">:</span> <span style="color: #79C0FF">True</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">"atual"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">_operacao_para_tela(r),</span>
+                           <span style="color: #A5D6FF">"outro"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">_operacao_para_tela(r_outro)})</span>
+    <span style="color: #FF7B72">except</span> <span style="color: #E6EDF3">(</span><span style="color: #F0883E; font-weight: bold">ValueError</span><span style="color: #E6EDF3">,</span> <span style="color: #F0883E; font-weight: bold">ZeroDivisionError</span><span style="color: #E6EDF3">)</span> <span style="color: #FF7B72">as</span> <span style="color: #E6EDF3">erro:</span>
+        <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">json</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">dumps({</span><span style="color: #A5D6FF">"ok"</span><span style="color: #E6EDF3">:</span> <span style="color: #79C0FF">False</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">"erro"</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">str(erro)})</span>
+</pre></div>
+</div></figure>
+
+<h3>3.5 Decisões de implementação</h3>
+<ul>
+  <li><strong>Decimal em vez de float.</strong> O float do Python guarda os números em base 2, onde 0.29 ou 0.76545
+  não têm representação exata. No protótipo da equipe, que usava float, truncar 0.29 com 2 dígitos dava
+  <strong>0.28</strong>, porque o computador guarda 0.29 como 0.28999999999999998… O módulo
+  <span class="mono">decimal</span><sup class="cit">[5]</sup> faz as contas em base 10, como no caderno. Assim, o único
+  erro que aparece é o que queremos estudar: o da máquina de n dígitos.</li>
+  <li><strong>ROUND_HALF_UP em vez de round().</strong> O <span class="mono">round()</span> do Python faz o
+  "arredondamento bancário": no empate exato, ele arredonda para o dígito par. Com ele, 0.76545 viraria 0.7654, e o
+  roteiro espera 0.7655. Usamos a regra ensinada em sala: 5 ou mais, sobe.</li>
+  <li><strong>Dois modos de contar os dígitos.</strong> O roteiro pede t = 4 dígitos significativos, mas os valores
+  mostrados no Exemplo 3 do PDF usam 4 casas decimais (seção 5.5). O simulador tem os dois modos.</li>
+  <li><strong>Valor exato com 50 dígitos.</strong> Para +, − e × com os números digitados, o Decimal dá o resultado
+  exato de verdade. Na divisão, o corte acontece no 50º dígito, muito além de qualquer erro medido.</li>
+  <li><strong>Entradas validadas.</strong> Textos que não são números, divisão por zero e valores de n fora do
+  intervalo geram mensagens claras em português, sem encerrar o programa.</li>
+</ul>
+
+<h3>3.6 A calculadora web</h3>
+<p>A versão online tem um teclado de calculadora e, ao lado, um painel com o resultado e o <strong>passo a passo</strong>.
+Ao apertar "=", as seis etapas acendem uma de cada vez. Cada etapa diz qual função do
+<span class="mono">simulador.py</span> está trabalhando, pelo que ela é responsável e o que aconteceu com os números,
+desenhando o corte (o que fica à esquerda da barra é guardado; o que fica à direita é descartado).</p>
+<figure class="imagem "><img src="imagens/calculadora.png" alt="Figura 1. Calculadora web com o Exemplo 2 (arredondamento): resultado, comparação entre os métodos, conclusão e passo a passo."><figcaption>Figura 1. Calculadora web com o Exemplo 2 (arredondamento): resultado, comparação entre os métodos, conclusão e passo a passo.</figcaption></figure>
+<p>No modo <strong>Código</strong>, cada etapa mostra a chamada real da função, o valor devolvido e as linhas do
+<span class="mono">simulador.py</span> que rodaram, com o número de cada linha. As setas permitem avançar etapa por
+etapa, o que ajuda na apresentação.</p>
+<figure class="imagem estreita"><img src="imagens/etapas-codigo.png" alt="Figura 2. Etapas 1 a 4 do passo a passo no modo Código."><figcaption>Figura 2. Etapas 1 a 4 do passo a passo no modo Código.</figcaption></figure>
+<p>A página tem ainda as abas <em>Exemplos do roteiro</em> (Figura 3), <em>Somas sucessivas</em> (com gráfico e
+tabela), <em>Código</em> (o <span class="mono">simulador.py</span> completo, com índice das partes; Figura 4) e
+<em>Teoria</em>. Para um novo cálculo basta digitar outros números ou apertar AC.</p>
+<figure class="imagem "><img src="imagens/exemplos.png" alt="Figura 3. Aba Exemplos do roteiro."><figcaption>Figura 3. Aba Exemplos do roteiro.</figcaption></figure>
+<figure class="imagem "><img src="imagens/codigo.png" alt="Figura 4. Aba Código: o mesmo simulador.py que roda na página."><figcaption>Figura 4. Aba Código: o mesmo simulador.py que roda na página.</figcaption></figure>
+</section>
+
+<section id="s4">
+<h2>4. Testes e resultados</h2>
+<p>Seguimos o procedimento comum do roteiro: para cada caso informamos os dados, calculamos o resultado de referência
+com precisão máxima, executamos o simulador com <strong>t = 4</strong> por truncamento e por arredondamento e
+comparamos os resultados em tabela. Todos os valores abaixo foram gerados pelo próprio
+<span class="mono">simulador.py</span> (<span class="mono">python simulador.py --testes</span>) e conferem com a
+calculadora online. Nas tabelas, "na máquina" é o valor guardado com 4 dígitos; os zeros à direita mostram os
+dígitos que a máquina ocupa.</p>
+
+<h3>4.1 Exemplo 1: operação simples (soma)</h3>
+<p>O roteiro pede a soma de dois números com 5 casas decimais. Escolhemos <strong>π ≈ 3.14159</strong> e
+<strong>e ≈ 2.71828</strong>. Valor exato: 3.14159 + 2.71828 = <strong>5.85987</strong>.</p>
+<figure class="tabela "><table><thead><tr><th>Método</th><th>x na máquina</th><th>y na máquina</th><th>Conta da máquina</th><th>Aproximado</th><th>Ea</th><th>Er</th><th>Er (%)</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">3.141</span></td><td><span class="mono">2.718</span></td><td><span class="mono">3.141 + 2.718 = 5.859</span></td><td><b class="mono">5.859</b></td><td><span class="mono">0.00087</span></td><td><span class="mono">0.00014849</span></td><td><span class="mono">0.014849 %</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">3.142</span></td><td><span class="mono">2.718</span></td><td><span class="mono">3.142 + 2.718 = 5.86</span></td><td><b class="mono">5.860</b></td><td><span class="mono">0.00013</span></td><td><span class="mono">0.0000221843</span></td><td><span class="mono">0.00221843 %</span></td></tr></tbody></table><figcaption>Tabela 1. Exemplo 1 com t = 4.</figcaption></figure>
+<p>Os dois operandos já perdem informação ao entrar na máquina: 3.14159 vira 3.141 (truncando) ou 3.142
+(arredondando). O truncamento joga os dois números para baixo, e o resultado fica 0.00087 abaixo do
+exato. O arredondamento erra 0.00013, cerca de 6.7 vezes
+menos. Os dois erros relativos (0.014849 % e 0.00221843 %) ficam dentro dos limites
+teóricos da seção 2.2.</p>
+
+<h3>4.2 Exemplo 2: propagação de erro e cancelamento subtrativo</h3>
+<p>x = 0.76545 e y = 0.76541 diferem só na última casa. Valor exato: x − y = <strong>0.00004</strong> = 4.0 × 10⁻⁵.
+Como pede o roteiro, x e y são armazenados com 4 dígitos antes da subtração.</p>
+<figure class="tabela "><table><thead><tr><th>Método</th><th>x na máquina</th><th>y na máquina</th><th>Conta da máquina</th><th>Aproximado</th><th>Ea</th><th>Er</th><th>Er (%)</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">0.7654</span></td><td><span class="mono">0.7654</span></td><td><span class="mono">0.7654 − 0.7654 = 0</span></td><td><b class="mono">0</b></td><td><span class="mono">0.00004</span></td><td><span class="mono">indefinido</span></td><td><span class="mono">indefinido</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">0.7655</span></td><td><span class="mono">0.7654</span></td><td><span class="mono">0.7655 − 0.7654 = 0.0001</span></td><td><b class="mono">0.0001000</b></td><td><span class="mono">0.00006</span></td><td><span class="mono">0.6</span></td><td><span class="mono">60 %</span></td></tr></tbody></table><figcaption>Tabela 2. Exemplo 2 com t = 4.</figcaption></figure>
+<p><strong>Com arredondamento</strong> o resultado é exatamente o do roteiro: x vira 0.7655, y vira 0.7654,
+0.7655 − 0.7654 = 0.0001, Ea = 0.00006 e Er = 0.6 (<strong>60%</strong>).</p>
+<p><strong>Com truncamento</strong> acontece o caso que o roteiro pede para demonstrar: x e y viram
+<strong>ambos 0.7654</strong> e a subtração dá <strong>zero</strong>. A máquina perde o resultado inteiro, e o erro
+relativo da fórmula do roteiro nem pode ser calculado, porque o aproximado é 0. Em relação ao valor exato, o erro
+relativo é de 100%.</p>
+<figure class="codigo terminal"><figcaption>Saída do terminal: opção 3 do menu (Exemplo 2)</figcaption><div class="codigo-corpo"><pre>========================================================================
+  EXEMPLO 2 - CANCELAMENTO SUBTRATIVO
+========================================================================
+
+  Valor exato: 0.00004
+  Método         | x máquina | y máquina | Aproximado | Ea      | Er         | Er (%)    
+  ---------------+-----------+-----------+------------+---------+------------+-----------
+  truncamento    | 0.7654    | 0.7654    | 0          | 0.00004 | indefinido | indefinido
+  arredondamento | 0.7655    | 0.7654    | 0.0001000  | 0.00006 | 0.6        | 60 %      
+
+  &gt;&gt; Com truncamento, x e y ficaram IGUAIS na máquina e a subtração
+     deu ZERO (subtração nula): perdemos 100% da informação, e o erro
+     relativo nem pode ser calculado (divisão por zero).
+
+  O que observar: x e y estavam certos em 4 dígitos, mas são quase
+  iguais. Na subtração os dígitos iguais se cancelam e sobra só o
+  último dígito, que era justamente o que tinha erro. Um erro pequeno
+  nos operandos virou um erro relativo enorme no resultado.</pre></div></figure>
+<p>Para confirmar que o problema é a falta de dígitos, repetimos com <strong>n = 5</strong>: x e y cabem inteiros, a
+subtração dá 0.000040000 e o erro é <strong>0</strong> nos dois métodos.</p>
+
+<h3>4.3 Exemplo 3: propagação de erro em uma sequência de somas</h3>
+<p>Somar 0.56786 dez vezes. Valor exato: 10 × 0.56786 = <strong>5.6786</strong>. Seguindo o roteiro, a primeira
+soma é 0.56786 + 0.56786, e depois de <em>cada</em> soma o resultado é cortado em 4 dígitos significativos antes de
+entrar na soma seguinte (são 9 somas para 10 parcelas).</p>
+<figure class="tabela pequena"><table><thead><tr><th>Soma</th><th>Exato</th><th>Truncamento: conta</th><th>Guardado</th><th>Erro</th><th>Arredondamento: conta</th><th>Guardado</th><th>Erro</th></tr></thead><tbody><tr><td>1</td><td><span class="mono">1.13572</span></td><td><span class="mono">0.56786 + 0.56786 = 1.13572</span></td><td><b class="mono">1.135</b></td><td><span class="mono">0.00072</span></td><td><span class="mono">0.56786 + 0.56786 = 1.13572</span></td><td><b class="mono">1.136</b></td><td><span class="mono">0.00028</span></td></tr><tr><td>2</td><td><span class="mono">1.70358</span></td><td><span class="mono">1.135 + 0.56786 = 1.70286</span></td><td><b class="mono">1.702</b></td><td><span class="mono">0.00158</span></td><td><span class="mono">1.136 + 0.56786 = 1.70386</span></td><td><b class="mono">1.704</b></td><td><span class="mono">0.00042</span></td></tr><tr><td>3</td><td><span class="mono">2.27144</span></td><td><span class="mono">1.702 + 0.56786 = 2.26986</span></td><td><b class="mono">2.269</b></td><td><span class="mono">0.00244</span></td><td><span class="mono">1.704 + 0.56786 = 2.27186</span></td><td><b class="mono">2.272</b></td><td><span class="mono">0.00056</span></td></tr><tr><td>4</td><td><span class="mono">2.8393</span></td><td><span class="mono">2.269 + 0.56786 = 2.83686</span></td><td><b class="mono">2.836</b></td><td><span class="mono">0.0033</span></td><td><span class="mono">2.272 + 0.56786 = 2.83986</span></td><td><b class="mono">2.840</b></td><td><span class="mono">0.0007</span></td></tr><tr><td>5</td><td><span class="mono">3.40716</span></td><td><span class="mono">2.836 + 0.56786 = 3.40386</span></td><td><b class="mono">3.403</b></td><td><span class="mono">0.00416</span></td><td><span class="mono">2.840 + 0.56786 = 3.40786</span></td><td><b class="mono">3.408</b></td><td><span class="mono">0.00084</span></td></tr><tr><td>6</td><td><span class="mono">3.97502</span></td><td><span class="mono">3.403 + 0.56786 = 3.97086</span></td><td><b class="mono">3.970</b></td><td><span class="mono">0.00502</span></td><td><span class="mono">3.408 + 0.56786 = 3.97586</span></td><td><b class="mono">3.976</b></td><td><span class="mono">0.00098</span></td></tr><tr><td>7</td><td><span class="mono">4.54288</span></td><td><span class="mono">3.970 + 0.56786 = 4.53786</span></td><td><b class="mono">4.537</b></td><td><span class="mono">0.00588</span></td><td><span class="mono">3.976 + 0.56786 = 4.54386</span></td><td><b class="mono">4.544</b></td><td><span class="mono">0.00112</span></td></tr><tr><td>8</td><td><span class="mono">5.11074</span></td><td><span class="mono">4.537 + 0.56786 = 5.10486</span></td><td><b class="mono">5.104</b></td><td><span class="mono">0.00674</span></td><td><span class="mono">4.544 + 0.56786 = 5.11186</span></td><td><b class="mono">5.112</b></td><td><span class="mono">0.00126</span></td></tr><tr><td>9</td><td><span class="mono">5.6786</span></td><td><span class="mono">5.104 + 0.56786 = 5.67186</span></td><td><b class="mono">5.671</b></td><td><span class="mono">0.0076</span></td><td><span class="mono">5.112 + 0.56786 = 5.67986</span></td><td><b class="mono">5.680</b></td><td><span class="mono">0.0014</span></td></tr></tbody></table><figcaption>Tabela 3. Exemplo 3, passo a passo, com t = 4 dígitos significativos.</figcaption></figure>
+<figure class="tabela estreita"><table><thead><tr><th>Método</th><th>Exato</th><th>Aproximado</th><th>Ea total</th><th>Er total</th><th>Er (%)</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">5.6786</span></td><td><b class="mono">5.671</b></td><td><span class="mono">0.0076</span></td><td><span class="mono">0.00134015</span></td><td><span class="mono">0.134015 %</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">5.6786</span></td><td><b class="mono">5.680</b></td><td><span class="mono">0.0014</span></td><td><span class="mono">0.000246479</span></td><td><span class="mono">0.0246479 %</span></td></tr></tbody></table><figcaption>Tabela 4. Resultado final do Exemplo 3.</figcaption></figure>
+<figure class="grafico"><div class="legenda"><span><i style="background:#e2622b"></i>Truncamento</span><span><i style="background:#0a9d74"></i>Arredondamento</span></div><svg viewBox="0 0 640 230" role="img" aria-label="Figura 5. Erro absoluto acumulado a cada soma no Exemplo 3."><line x1="58" x2="624" y1="190.0" y2="190.0" stroke="#e3e8ee"/><text x="50" y="193.5" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0</text><line x1="58" x2="624" y1="145.5" y2="145.5" stroke="#e3e8ee"/><text x="50" y="149.0" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.0019</text><line x1="58" x2="624" y1="101.0" y2="101.0" stroke="#e3e8ee"/><text x="50" y="104.5" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.0038</text><line x1="58" x2="624" y1="56.5" y2="56.5" stroke="#e3e8ee"/><text x="50" y="60.0" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.0057</text><line x1="58" x2="624" y1="12.0" y2="12.0" stroke="#e3e8ee"/><text x="50" y="15.5" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.0076</text><text x="58.0" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">1</text><text x="128.8" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">2</text><text x="199.5" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">3</text><text x="270.2" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">4</text><text x="341.0" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">5</text><text x="411.8" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">6</text><text x="482.5" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">7</text><text x="553.2" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">8</text><text x="624.0" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">9</text><path d="M58.0,173.1 L128.8,153.0 L199.5,132.9 L270.2,112.7 L341.0,92.6 L411.8,72.4 L482.5,52.3 L553.2,32.1 L624.0,12.0" fill="none" stroke="#e2622b" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="624.0" cy="12.0" r="3.5" fill="#e2622b"/><path d="M58.0,183.4 L128.8,180.2 L199.5,176.9 L270.2,173.6 L341.0,170.3 L411.8,167.0 L482.5,163.8 L553.2,160.5 L624.0,157.2" fill="none" stroke="#0a9d74" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="624.0" cy="157.2" r="3.5" fill="#0a9d74"/><text x="349" y="226" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#6b7480">número da soma</text></svg><figcaption>Figura 5. Erro absoluto acumulado a cada soma no Exemplo 3.</figcaption></figure>
+<p>O roteiro apresenta esse exemplo com os valores 1.1357, 1.7035, 2.2713… Esses números têm 4 <strong>casas
+decimais</strong> (5 dígitos significativos). No modo "casas decimais", o simulador reproduz exatamente esses valores:</p>
+<figure class="tabela pequena"><table><thead><tr><th>Soma</th><th>Exato</th><th>Truncamento: conta</th><th>Guardado</th><th>Erro</th><th>Arredondamento: conta</th><th>Guardado</th><th>Erro</th></tr></thead><tbody><tr><td>1</td><td><span class="mono">1.13572</span></td><td><span class="mono">0.56786 + 0.56786 = 1.13572</span></td><td><b class="mono">1.1357</b></td><td><span class="mono">0.00002</span></td><td><span class="mono">0.56786 + 0.56786 = 1.13572</span></td><td><b class="mono">1.1357</b></td><td><span class="mono">0.00002</span></td></tr><tr><td>2</td><td><span class="mono">1.70358</span></td><td><span class="mono">1.1357 + 0.56786 = 1.70356</span></td><td><b class="mono">1.7035</b></td><td><span class="mono">0.00008</span></td><td><span class="mono">1.1357 + 0.56786 = 1.70356</span></td><td><b class="mono">1.7036</b></td><td><span class="mono">0.00002</span></td></tr><tr><td>3</td><td><span class="mono">2.27144</span></td><td><span class="mono">1.7035 + 0.56786 = 2.27136</span></td><td><b class="mono">2.2713</b></td><td><span class="mono">0.00014</span></td><td><span class="mono">1.7036 + 0.56786 = 2.27146</span></td><td><b class="mono">2.2715</b></td><td><span class="mono">0.00006</span></td></tr><tr><td>4</td><td><span class="mono">2.8393</span></td><td><span class="mono">2.2713 + 0.56786 = 2.83916</span></td><td><b class="mono">2.8391</b></td><td><span class="mono">0.0002</span></td><td><span class="mono">2.2715 + 0.56786 = 2.83936</span></td><td><b class="mono">2.8394</b></td><td><span class="mono">0.0001</span></td></tr><tr><td>5</td><td><span class="mono">3.40716</span></td><td><span class="mono">2.8391 + 0.56786 = 3.40696</span></td><td><b class="mono">3.4069</b></td><td><span class="mono">0.00026</span></td><td><span class="mono">2.8394 + 0.56786 = 3.40726</span></td><td><b class="mono">3.4073</b></td><td><span class="mono">0.00014</span></td></tr><tr><td>6</td><td><span class="mono">3.97502</span></td><td><span class="mono">3.4069 + 0.56786 = 3.97476</span></td><td><b class="mono">3.9747</b></td><td><span class="mono">0.00032</span></td><td><span class="mono">3.4073 + 0.56786 = 3.97516</span></td><td><b class="mono">3.9752</b></td><td><span class="mono">0.00018</span></td></tr><tr><td>7</td><td><span class="mono">4.54288</span></td><td><span class="mono">3.9747 + 0.56786 = 4.54256</span></td><td><b class="mono">4.5425</b></td><td><span class="mono">0.00038</span></td><td><span class="mono">3.9752 + 0.56786 = 4.54306</span></td><td><b class="mono">4.5431</b></td><td><span class="mono">0.00022</span></td></tr><tr><td>8</td><td><span class="mono">5.11074</span></td><td><span class="mono">4.5425 + 0.56786 = 5.11036</span></td><td><b class="mono">5.1103</b></td><td><span class="mono">0.00044</span></td><td><span class="mono">4.5431 + 0.56786 = 5.11096</span></td><td><b class="mono">5.1110</b></td><td><span class="mono">0.00026</span></td></tr><tr><td>9</td><td><span class="mono">5.6786</span></td><td><span class="mono">5.1103 + 0.56786 = 5.67816</span></td><td><b class="mono">5.6781</b></td><td><span class="mono">0.0005</span></td><td><span class="mono">5.1110 + 0.56786 = 5.67886</span></td><td><b class="mono">5.6789</b></td><td><span class="mono">0.0003</span></td></tr></tbody></table><figcaption>Tabela 5. Exemplo 3 no modo casas decimais (como no PDF do roteiro).</figcaption></figure>
+<figure class="tabela estreita"><table><thead><tr><th>Método</th><th>Exato</th><th>Aproximado</th><th>Ea total</th><th>Er total</th><th>Er (%)</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">5.6786</span></td><td><b class="mono">5.6781</b></td><td><span class="mono">0.0005</span></td><td><span class="mono">0.0000880576</span></td><td><span class="mono">0.00880576 %</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">5.6786</span></td><td><b class="mono">5.6789</b></td><td><span class="mono">0.0003</span></td><td><span class="mono">0.0000528271</span></td><td><span class="mono">0.00528271 %</span></td></tr></tbody></table><figcaption>Tabela 6. Resultado final do Exemplo 3 no modo casas decimais.</figcaption></figure>
+
+<h3>4.4 Testes criados pela equipe</h3>
+<p><strong>A) Divisão com dízima: 2 ÷ 3.</strong> O resultado 0.666… não cabe em nenhuma máquina finita.</p>
+<figure class="tabela "><table><thead><tr><th>Método</th><th>x na máquina</th><th>y na máquina</th><th>Conta da máquina</th><th>Aproximado</th><th>Ea</th><th>Er</th><th>Er (%)</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">2.000</span></td><td><span class="mono">3.000</span></td><td><span class="mono">2.000 ÷ 3.000 = 0.666666666667…</span></td><td><b class="mono">0.6666</b></td><td><span class="mono">0.0000666667</span></td><td><span class="mono">0.00010001</span></td><td><span class="mono">0.010001 %</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">2.000</span></td><td><span class="mono">3.000</span></td><td><span class="mono">2.000 ÷ 3.000 = 0.666666666667…</span></td><td><b class="mono">0.6667</b></td><td><span class="mono">0.0000333333</span></td><td><span class="mono">0.0000499975</span></td><td><span class="mono">0.00499975 %</span></td></tr></tbody></table><figcaption>Tabela 7. 2 ÷ 3 com t = 4.</figcaption></figure>
+<p><strong>B) A ordem das somas importa.</strong> Somar 0.4 dez vezes a 1000 (exato: 1004). Com 4 dígitos,
+1000 + 0.4 = 1000.4 não cabe e volta a ser 1000 a cada soma. Somando primeiro os 0.4 (que dão
+4.000) e só depois o 1000, o resultado é exato.</p>
+<figure class="tabela estreita"><table><thead><tr><th>Ordem das somas</th><th>Resultado na máquina</th><th>Exato</th></tr></thead><tbody><tr><td>1000 + 0.4 + 0.4 + … (1000 primeiro)</td><td><b class="mono">1000</b></td><td><span class="mono">1004</span></td></tr><tr><td>(0.4 + 0.4 + …) + 1000 (pequenos primeiro)</td><td><b class="mono">1004</b></td><td><span class="mono">1004</span></td></tr></tbody></table><figcaption>Tabela 8. Mesmas parcelas, ordens diferentes (arredondamento, t = 4).</figcaption></figure>
+<p><strong>C) O Exemplo 3 com 100 somas.</strong> Para ver o erro crescer por mais tempo.</p>
+<figure class="tabela estreita"><table><thead><tr><th>Método</th><th>Exato</th><th>Aproximado</th><th>Ea total</th><th>Er total</th><th>Er (%)</th></tr></thead><tbody><tr><td>Truncamento</td><td><span class="mono">56.786</span></td><td><b class="mono">56.12</b></td><td><span class="mono">0.666</span></td><td><span class="mono">0.0118674</span></td><td><span class="mono">1.18674 %</span></td></tr><tr><td>Arredondamento</td><td><span class="mono">56.786</span></td><td><b class="mono">56.96</b></td><td><span class="mono">0.174</span></td><td><span class="mono">0.00305478</span></td><td><span class="mono">0.305478 %</span></td></tr></tbody></table><figcaption>Tabela 9. 0.56786 somado 100 vezes, t = 4.</figcaption></figure>
+<figure class="grafico"><div class="legenda"><span><i style="background:#e2622b"></i>Truncamento</span><span><i style="background:#0a9d74"></i>Arredondamento</span></div><svg viewBox="0 0 640 230" role="img" aria-label="Figura 6. Erro absoluto acumulado em 100 somas. A mudança de inclinação acontece quando o acumulado passa de 10."><line x1="58" x2="624" y1="190.0" y2="190.0" stroke="#e3e8ee"/><text x="50" y="193.5" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0</text><line x1="58" x2="624" y1="145.5" y2="145.5" stroke="#e3e8ee"/><text x="50" y="149.0" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.17</text><line x1="58" x2="624" y1="101.0" y2="101.0" stroke="#e3e8ee"/><text x="50" y="104.5" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.33</text><line x1="58" x2="624" y1="56.5" y2="56.5" stroke="#e3e8ee"/><text x="50" y="60.0" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.5</text><line x1="58" x2="624" y1="12.0" y2="12.0" stroke="#e3e8ee"/><text x="50" y="15.5" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">0.67</text><text x="58.0" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">1</text><text x="121.5" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">12</text><text x="185.1" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">23</text><text x="248.6" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">34</text><text x="312.1" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">45</text><text x="375.7" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">56</text><text x="439.2" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">67</text><text x="502.7" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">78</text><text x="566.2" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">89</text><text x="624.0" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7480">99</text><path d="M58.0,189.8 L63.8,189.6 L69.6,189.3 L75.3,189.1 L81.1,188.9 L86.9,188.7 L92.7,188.4 L98.4,188.2 L104.2,188.0 L110.0,187.7 L115.8,187.5 L121.5,187.3 L127.3,187.0 L133.1,186.8 L138.9,186.6 L144.6,186.4 L150.4,184.3 L156.2,182.2 L162.0,180.1 L167.7,178.0 L173.5,175.9 L179.3,173.8 L185.1,171.7 L190.8,169.6 L196.6,167.5 L202.4,165.4 L208.2,163.3 L213.9,161.2 L219.7,159.1 L225.5,156.9 L231.3,154.8 L237.0,152.7 L242.8,150.6 L248.6,148.5 L254.4,146.4 L260.1,144.3 L265.9,142.2 L271.7,140.1 L277.5,138.0 L283.2,135.9 L289.0,133.8 L294.8,131.7 L300.6,129.6 L306.3,127.5 L312.1,125.4 L317.9,123.3 L323.7,121.2 L329.4,119.1 L335.2,117.0 L341.0,114.9 L346.8,112.8 L352.6,110.7 L358.3,108.6 L364.1,106.5 L369.9,104.4 L375.7,102.3 L381.4,100.2 L387.2,98.1 L393.0,96.0 L398.8,93.9 L404.5,91.8 L410.3,89.7 L416.1,87.6 L421.9,85.5 L427.6,83.4 L433.4,81.3 L439.2,79.2 L445.0,77.1 L450.7,75.0 L456.5,72.9 L462.3,70.8 L468.1,68.7 L473.8,66.6 L479.6,64.5 L485.4,62.4 L491.2,60.3 L496.9,58.2 L502.7,56.1 L508.5,54.0 L514.3,51.9 L520.0,49.8 L525.8,47.7 L531.6,45.6 L537.4,43.5 L543.1,41.4 L548.9,39.3 L554.7,37.2 L560.5,35.1 L566.2,33.0 L572.0,30.9 L577.8,28.8 L583.6,26.7 L589.3,24.6 L595.1,22.5 L600.9,20.4 L606.7,18.3 L612.4,16.2 L618.2,14.1 L624.0,12.0" fill="none" stroke="#e2622b" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="624.0" cy="12.0" r="3.5" fill="#e2622b"/><path d="M58.0,189.9 L63.8,189.9 L69.6,189.9 L75.3,189.8 L81.1,189.8 L86.9,189.7 L92.7,189.7 L98.4,189.7 L104.2,189.6 L110.0,189.6 L115.8,189.6 L121.5,189.5 L127.3,189.5 L133.1,189.4 L138.9,189.4 L144.6,189.4 L150.4,189.6 L156.2,189.8 L162.0,189.3 L167.7,188.7 L173.5,188.1 L179.3,187.5 L185.1,187.0 L190.8,186.4 L196.6,185.8 L202.4,185.2 L208.2,184.7 L213.9,184.1 L219.7,183.5 L225.5,183.0 L231.3,182.4 L237.0,181.8 L242.8,181.2 L248.6,180.7 L254.4,180.1 L260.1,179.5 L265.9,179.0 L271.7,178.4 L277.5,177.8 L283.2,177.2 L289.0,176.7 L294.8,176.1 L300.6,175.5 L306.3,175.0 L312.1,174.4 L317.9,173.8 L323.7,173.2 L329.4,172.7 L335.2,172.1 L341.0,171.5 L346.8,170.9 L352.6,170.4 L358.3,169.8 L364.1,169.2 L369.9,168.7 L375.7,168.1 L381.4,167.5 L387.2,166.9 L393.0,166.4 L398.8,165.8 L404.5,165.2 L410.3,164.7 L416.1,164.1 L421.9,163.5 L427.6,162.9 L433.4,162.4 L439.2,161.8 L445.0,161.2 L450.7,160.7 L456.5,160.1 L462.3,159.5 L468.1,158.9 L473.8,158.4 L479.6,157.8 L485.4,157.2 L491.2,156.7 L496.9,156.1 L502.7,155.5 L508.5,154.9 L514.3,154.4 L520.0,153.8 L525.8,153.2 L531.6,152.6 L537.4,152.1 L543.1,151.5 L548.9,150.9 L554.7,150.4 L560.5,149.8 L566.2,149.2 L572.0,148.6 L577.8,148.1 L583.6,147.5 L589.3,146.9 L595.1,146.4 L600.9,145.8 L606.7,145.2 L612.4,144.6 L618.2,144.1 L624.0,143.5" fill="none" stroke="#0a9d74" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="624.0" cy="143.5" r="3.5" fill="#0a9d74"/><text x="349" y="226" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" fill="#6b7480">número da soma</text></svg><figcaption>Figura 6. Erro absoluto acumulado em 100 somas. A mudança de inclinação acontece quando o acumulado passa de 10.</figcaption></figure>
+<p><strong>D) O próprio float também erra.</strong> As mesmas contas feitas com float, o tipo numérico padrão do
+Python, e com Decimal:</p>
+<figure class="tabela estreita"><table><thead><tr><th>Conta</th><th>Resultado em float</th><th>Resultado em Decimal</th></tr></thead><tbody><tr><td><span class="mono">0.1 + 0.2</span></td><td><span class="mono">0.30000000000000004</span></td><td><span class="mono">0.3</span></td></tr><tr><td><span class="mono">0.76545 − 0.76541</span></td><td><span class="mono">3.999999999992898e-05</span></td><td><span class="mono">0.00004</span></td></tr><tr><td><span class="mono">0.29 × 100</span></td><td><span class="mono">28.999999999999996</span></td><td><span class="mono">29</span></td></tr></tbody></table><figcaption>Tabela 10. Erros de representação do float (binário).</figcaption></figure>
+</section>
+
+<section id="s5">
+<h2>5. Análise crítica</h2>
+<h3>5.1 Por que os erros aparecem</h3>
+<p>Em todos os testes a causa é a mesma: a máquina só guarda 4 dígitos, então todo número com mais dígitos é
+substituído pelo número guardável mais próximo (arredondamento) ou pelo imediatamente abaixo, em módulo
+(truncamento). A informação descartada não volta. O erro aparece em dois momentos:</p>
+<ul>
+  <li>quando os operandos entram na máquina (no Exemplo 1, π vira 3.141 ou 3.142);</li>
+  <li>quando o resultado é cortado (no Exemplo 3, 1.13572 vira 1.135 ou 1.136).</li>
+</ul>
+
+<h3>5.2 Truncamento × arredondamento</h3>
+<figure class="tabela estreita"><table><thead><tr><th>Teste</th><th>Ea truncamento</th><th>Ea arredondamento</th><th>Arredondamento erra</th></tr></thead><tbody><tr><td>Ex. 1 · 3.14159 + 2.71828</td><td><span class="mono">0.00087</span></td><td><span class="mono">0.00013</span></td><td>6.7×</td></tr><tr><td>Ex. 2 · 0.76545 − 0.76541</td><td><span class="mono">0.00004</span> (resultado 0)</td><td><span class="mono">0.00006</span></td><td>truncamento menor, mas perdeu o resultado</td></tr><tr><td>Ex. 3 · 10 somas</td><td><span class="mono">0.0076</span></td><td><span class="mono">0.0014</span></td><td>5.4×</td></tr><tr><td>Extra A · 2 ÷ 3</td><td><span class="mono">0.0000666667</span></td><td><span class="mono">0.0000333333</span></td><td>2×</td></tr><tr><td>Extra C · 100 somas</td><td><span class="mono">0.666</span></td><td><span class="mono">0.174</span></td><td>3.8×</td></tr></tbody></table><figcaption>Tabela 11. Comparação do erro absoluto entre os métodos.</figcaption></figure>
+<p>Na maioria dos casos o arredondamento erra bem menos, como prevê a teoria: o erro de cada corte é no máximo meia
+unidade do último dígito, contra quase uma unidade inteira no truncamento. A diferença mais importante, porém, é a
+<strong>direção</strong>. O truncamento leva sempre o número para mais perto do zero, então os erros de vários cortes
+têm o mesmo sinal e se somam. No Exemplo 3, cada soma perde cerca de 0.00086 por truncamento, sempre para baixo.
+Já o arredondamento ora sobe, ora desce, conforme os dígitos descartados. No Exemplo 3 ele sobe sempre (cerca de
+0.00014 por soma), porque a parcela é sempre a mesma e deixa sempre o mesmo resto. Ainda assim, o erro é cerca de
+6.1 vezes menor por passo.</p>
+<p>O Exemplo 2 mostra que o arredondamento não é melhor em <em>todo</em> caso individual. Ali o truncamento teve o
+menor erro absoluto (0.00004 contra 0.00006), mas a resposta dele foi zero,
+ou seja, ele perdeu completamente o resultado. Os dois são desastrosos nesse caso, por causa do cancelamento.</p>
+
+<h3>5.3 O cancelamento subtrativo (Exemplo 2)</h3>
+<p>Ao entrar na máquina, x e y ganharam erros pequenos: 0.00005 e 0.00001 (menos de 0.01% de cada valor). Na
+subtração, os três primeiros dígitos (0.765) são iguais e se cancelam, e sobra só o último, justamente o que estava
+errado. O erro dos operandos, somado (0.00006), passa a ser comparado com um resultado minúsculo
+(0.00004). O erro relativo em relação ao exato é 150 %, e o da fórmula do roteiro, 60%. Isso
+acontece porque o erro relativo de uma diferença é aproximadamente (|x|·εx + |y|·εy) / |x − y|: quanto mais próximos x
+e y, menor o denominador e maior a amplificação<sup class="cit">[1]</sup>.</p>
+<p>Há duas formas de evitar o problema:</p>
+<ul>
+  <li><strong>usar mais dígitos nas contas intermediárias:</strong> com n = 5 o resultado do Exemplo 2 fica exato;</li>
+  <li><strong>reescrever a fórmula para não subtrair números próximos:</strong> por exemplo, calcular
+  √(x+1) − √x como 1 / (√(x+1) + √x).</li>
+</ul>
+
+<h3>5.4 A propagação nas somas (Exemplo 3 e testes B e C)</h3>
+<p>No Exemplo 3 o erro cresce de forma quase linear, porque cada soma acrescenta um erro parecido com o da anterior
+(Figura 5). Com 100 somas (Figura 6) aparece um detalhe próprio do ponto flutuante. Até a 16ª soma, o
+acumulado está entre 1 e 10, e 4 dígitos significativos dão 3 casas decimais (ex.: 5.671). A partir da 17ª, ele
+passa de 10, e os mesmos 4 dígitos dão só 2 casas (ex.: 10.21). Cada soma passa a perder 10 vezes mais, e a curva fica
+mais inclinada. No ponto flutuante, o que se mantém sob controle é o erro <strong>relativo</strong> de cada operação; o
+erro absoluto cresce com o tamanho do número.</p>
+<p>O teste B mostra uma consequência prática: na máquina, a soma <strong>não é associativa</strong>. Somar um número
+pequeno a um muito maior pode não mudar nada, porque o pequeno fica inteiro abaixo do último dígito guardado. Somar
+os pequenos primeiro preserva a informação. É por isso que algoritmos numéricos se preocupam com a ordem das
+operações.</p>
+
+<h3>5.5 Uma observação sobre o Exemplo 3 do roteiro</h3>
+<p>O enunciado pede uma máquina com t = 4 dígitos significativos, mas ao detalhar o Exemplo 3 mostra 1.13572 → 1.1357,
+um valor com 5 dígitos significativos (4 casas decimais). Com 4 dígitos significativos de fato, a primeira soma fica
+1.135 (truncamento) e o resultado final é 5.671, e não 5.6781. Como o PDF não é
+consistente nesse ponto, o simulador oferece os dois modos. As Tabelas 3 e 4 seguem o t = 4 do enunciado, e as
+Tabelas 5 e 6 reproduzem o PDF. As conclusões são as mesmas nos dois casos: o erro cresce a cada soma e o truncamento
+erra mais. Com 4 casas decimais, a máquina tem 5 dígitos significativos para números entre 1 e 10, e por isso o erro
+final é menor (0.0005 contra 0.0076 no truncamento).</p>
+
+<h3>5.6 O "valor exato" e a precisão do próprio computador</h3>
+<p>O roteiro pede o valor exato "calculado com a precisão máxima da linguagem". A Tabela 10 mostra por que isso
+exige cuidado: em float, 0.1 + 0.2 dá 0.30000000000000004 e 0.76545 − 0.76541 dá 3.999999999992898e-05, porque esses
+números não têm representação exata em base 2<sup class="cit">[3, 4]</sup>. Se usássemos float como referência, o
+"valor exato" já viria com erro, e o próprio truncamento sairia errado (o caso 0.29 → 0.28 do protótipo). Com o
+<span class="mono">Decimal</span>, a referência é exata para +, − e × e tem 50 dígitos corretos na divisão.</p>
+
+<h3>5.7 Sobre a fórmula do erro relativo</h3>
+<p>Seguimos o roteiro e dividimos pelo valor <strong>aproximado</strong>. Muitos livros dividem pelo valor
+<strong>exato</strong><sup class="cit">[1, 2]</sup>. Os dois ficam próximos quando o erro é pequeno, mas se afastam quando
+ele é grande: no Exemplo 2 com arredondamento, Er é 60% pela fórmula do roteiro e 150% em relação ao exato. Quando o
+aproximado é 0 (subtração nula), só a versão com o exato existe (100%). Por isso o simulador mostra "indefinido"
+nesse caso.</p>
+
+<h3>5.8 Limitações</h3>
+<ul>
+  <li><strong>O expoente não tem limite.</strong> No sistema F(β, t, m, M) o expoente fica entre −m e M; o simulador
+  não simula overflow nem underflow.</li>
+  <li><strong>A máquina é decimal (β = 10).</strong> Computadores reais usam base 2 (padrão IEEE 754<sup class="cit">[4]</sup>),
+  mas o fenômeno de truncar ou arredondar é o mesmo.</li>
+  <li><strong>Cada operação é feita exata e só depois cortada.</strong> É o modelo de "resultado corretamente
+  arredondado" do IEEE 754; o simulador não reproduz dígitos de guarda nem detalhes de hardware.</li>
+</ul>
+</section>
+
+<section id="s6">
+<h2>6. Conclusões</h2>
+<ol class="conclusoes">
+  <li>Todo número guardado com uma quantidade finita de dígitos carrega um erro, mesmo antes de qualquer conta.</li>
+  <li>O arredondamento erra no máximo meia unidade do último dígito; o truncamento, quase uma unidade inteira e
+  sempre na mesma direção. Por isso, em sequências de contas, o truncamento acumula erro mais depressa.</li>
+  <li>Subtrair números muito próximos transforma erros pequenos nos operandos em um erro relativo enorme (60% no
+  Exemplo 2) ou apaga o resultado (a subtração nula).</li>
+  <li>Em contas sequenciais, o erro de cada passo vira entrada do passo seguinte e se acumula; e o erro absoluto
+  cresce junto com o tamanho dos números.</li>
+  <li>Na máquina, a soma não é associativa: a ordem das operações muda o resultado.</li>
+  <li>A ferramenta usada como "valor exato" importa: o float também tem erro de representação, por isso o
+  simulador faz as contas em base 10 com Decimal.</li>
+</ol>
+</section>
+
+<section id="s7">
+<h2>7. Participação da equipe</h2>
+<figure class="tabela estreita"><table><thead><tr><th>Integrante</th><th>Participação</th></tr></thead><tbody><tr><td><strong>Glauco Erasmo</strong></td><td>Finalizou o projeto: versão final do código (simulador e calculadora web), repositório no GitHub e relatório.</td></tr><tr><td><strong>Cristiana Campinho</strong></td><td>Fez os ajustes da finalização do projeto.</td></tr><tr><td><strong>Alexandre Macedo</strong></td><td>Fez o protótipo inicial em Tkinter (primeira versão da calculadora, com as quatro operações, truncamento, arredondamento e os testes rápidos) e ajudou a Cristiana nos ajustes.</td></tr></tbody></table></figure>
+<p>A evolução do trabalho pode ser vista no histórico de commits do repositório: o primeiro commit é o protótipo do
+Alexandre, e os seguintes mostram a reescrita do núcleo com Decimal, o menu do terminal e a calculadora web.</p>
+</section>
+
+<section id="refs">
+<h2 class="sem-numero">Referências</h2>
+<ol class="referencias">
+  <li>RUGGIERO, M. A. G.; LOPES, V. L. R. <em>Cálculo numérico: aspectos teóricos e computacionais</em>. 2. ed. São Paulo: Makron Books, 1996.</li>
+  <li>BURDEN, R. L.; FAIRES, J. D.; BURDEN, A. M. <em>Análise numérica</em>. Tradução da 10. ed. norte-americana. São Paulo: Cengage Learning, 2016.</li>
+  <li>GOLDBERG, D. What every computer scientist should know about floating-point arithmetic. <em>ACM Computing Surveys</em>, v. 23, n. 1, p. 5–48, 1991.</li>
+  <li>IEEE. <em>IEEE Standard for Floating-Point Arithmetic</em> (IEEE Std 754-2019). New York: IEEE, 2019.</li>
+  <li>PYTHON SOFTWARE FOUNDATION. <em>decimal: Decimal fixed-point and floating-point arithmetic</em>. Documentação do Python 3. Disponível em: https://docs.python.org/3/library/decimal.html.</li>
+  <li>PYODIDE. <em>Pyodide documentation</em>. Disponível em: https://pyodide.org.</li>
+  <li>UNIVASF. <em>Projeto Unidade 1 (Erros): roteiro da Atividade Prática 1</em>. Disciplina de Cálculo Numérico, 2026.2.</li>
+</ol>
+</section>
+
+</body></html>

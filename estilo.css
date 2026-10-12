@@ -34,7 +34,7 @@ svg.ic { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; }
 [hidden] { display: none !important; }
 
 /* ---------- barra superior ---------- */
-.barra { display: flex; align-items: center; gap: 16px 22px; flex-wrap: wrap; padding-block: 22px 26px; }
+.barra { display: flex; align-items: center; gap: 16px 18px; flex-wrap: wrap; padding-block: 22px 26px; }
 .marca { display: flex; align-items: center; gap: 12px; margin-right: auto; }
 .logo { width: 42px; height: 42px; border-radius: 13px; background: var(--grad); color: #0a1a12; display: grid; place-items: center; font-size: 1.25rem; }
 .marca strong { display: block; font-family: var(--f-titulo); font-size: 1.12rem; font-weight: 600; letter-spacing: -.01em; }
@@ -44,7 +44,7 @@ svg.ic { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; }
 .status-python.pronto i { background: var(--menta); }
 .status-python.falhou i { background: var(--vermelho); }
 .abas { display: flex; gap: 4px; background: var(--painel); border: 1px solid var(--borda); border-radius: 999px; padding: 5px; flex-wrap: wrap; }
-.abas button { display: flex; align-items: center; gap: 8px; border: 0; background: none; color: var(--texto-2); padding: 9px 14px; border-radius: 999px; cursor: pointer; font-weight: 500; font-size: .9rem; }
+.abas button { display: flex; align-items: center; gap: 7px; border: 0; background: none; color: var(--texto-2); padding: 9px 12px; border-radius: 999px; cursor: pointer; font-weight: 500; font-size: .9rem; }
 .abas button:hover { color: var(--texto); }
 .abas button[aria-selected="true"] { background: var(--texto); color: #0b0c0f; }
 .link-git { display: flex; align-items: center; gap: 8px; color: var(--texto); text-decoration: none; border: 1px solid var(--borda-forte); border-radius: 999px; padding: 9px 16px; font-size: .88rem; font-weight: 500; }

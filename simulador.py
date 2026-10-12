@@ -3,7 +3,7 @@
 =====================================================================
  CALCULADORA DE ERROS - SIMULADOR DE PROPAGAÇÃO DE ERROS NUMÉRICOS
  Cálculo Numérico - UNIVASF - Projeto Unidade 1 (Erros) - 2026.2
- Equipe: Glauco Erasmo, Cristiana Campinho e Alexandre
+ Equipe: Glauco Erasmo, Cristiana Campinho e Alexandre Macedo
 =====================================================================
 
 Ideia geral
@@ -40,7 +40,7 @@ Mapa do arquivo (de cima para baixo)
 
 Histórico
 ---------
-A primeira versão (protótipo com janela em Tkinter, feito pelo Alexandre)
+A primeira versão (protótipo com janela em Tkinter, feito pelo Alexandre Macedo)
 usava float. Ao testar, percebemos que o próprio float atrapalhava a
 simulação: truncar 0.29 com 2 dígitos dava 0.28, porque o computador
 guarda 0.29 como 0.28999999999999998... Por isso esta versão usa o

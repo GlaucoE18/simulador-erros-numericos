@@ -536,9 +536,13 @@ function irEtapa(delta) {
    PARTE 7 - ABAS: EXEMPLOS, SOMAS SUCESSIVAS E CÓDIGO
    ===================================================================== */
 
+const ABAS = ["calc", "exemplos", "somas", "codigo", "teoria"];
+
 function trocarAba(nome) {
+  if (!ABAS.includes(nome)) nome = "calc";
+  history.replaceState(null, "", nome === "calc" ? location.pathname + location.search : "#" + nome);  // link direto para a aba
   document.querySelectorAll(".abas [role=tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.aba === nome));
-  ["calc", "exemplos", "somas", "codigo", "teoria"].forEach((a) => { $("aba-" + a).hidden = a !== nome; });
+  ABAS.forEach((a) => { $("aba-" + a).hidden = a !== nome; });
   if (nome === "exemplos") renderExemplos();
   if (nome === "somas") renderSomas();
 }
@@ -734,7 +738,10 @@ document.addEventListener("keydown", (ev) => {
   tecla(t);
 });
 
+// Links diretos: ...#exemplos abre a aba de exemplos; ?explicacao=codigo abre o passo a passo no modo código
+if (new URLSearchParams(location.search).get("explicacao") === "codigo") estado.explicacao = "cod";
 pintarIcones();
 montarPassos();
 render();
+if (location.hash) trocarAba(location.hash.slice(1));
 iniciarPython();

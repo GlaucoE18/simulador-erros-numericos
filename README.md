@@ -123,15 +123,13 @@ A análise completa de cada caso está no relatório.
 
 | Integrante | Participação |
 |---|---|
-| **Glauco Erasmo** | Coordenação do projeto e do repositório _(a completar)_ |
-| **Cristiana Campinho** | _(a completar)_ |
-| **Alexandre** | Protótipo inicial em Tkinter (primeira versão da calculadora e dos testes rápidos) |
-
-_A equipe completa esta tabela com o que cada um fez._
+| **Glauco Erasmo** | Finalização do projeto: versão final do código, calculadora web, repositório e relatório |
+| **Cristiana Campinho** | Ajustes na finalização do projeto |
+| **Alexandre Macedo** | Protótipo inicial em Tkinter (primeira versão da calculadora e dos testes rápidos) e apoio à Cristiana nos ajustes |
 
 ## Histórico
 
-A primeira versão foi um protótipo com janela em **Tkinter**, feito pelo **Alexandre** ([primeiro commit deste repositório](https://github.com/GlaucoE18/simulador-erros-numericos/commit/f24b315c368bf06c26482162969d71639d7173cc)). A versão atual mantém a ideia e as cores do protótipo, e acrescenta:
+A primeira versão foi um protótipo com janela em **Tkinter**, feito pelo **Alexandre Macedo** ([primeiro commit deste repositório](https://github.com/GlaucoE18/simulador-erros-numericos/commit/f24b315c368bf06c26482162969d71639d7173cc)). A versão atual mantém a ideia e as cores do protótipo, e acrescenta:
 
 - contas exatas com `Decimal`;
 - a forma normalizada `0.d₁d₂…×10ᵉ`;

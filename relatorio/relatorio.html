@@ -67,7 +67,8 @@ h2.sem-numero { border-bottom: 1.5pt solid var(--tinta); }
 .capa { height: 297mm; background: #0b0c0f; color: #eef1f4; padding: 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
 .capa-topo { display: flex; gap: 12pt; align-items: center; font-size: 9pt; color: #9ba3b1; }
 .capa-topo p { margin: 0; text-align: left; }
-.logo { width: 34pt; height: 34pt; border-radius: 10pt; background: linear-gradient(135deg, #4cf0b0, #a6f39a 55%, #d6f57c); flex: none; }
+.logo { width: 34pt; height: 34pt; border-radius: 10pt; background: linear-gradient(135deg, #4cf0b0, #a6f39a 55%, #d6f57c); flex: none; display: grid; place-items: center; color: #0a1a12; }
+.logo svg { width: 19pt; height: 19pt; }
 .capa-rotulo { color: #4cf0b0; font-size: 10pt; margin-bottom: 8pt; text-align: left; }
 .capa h1 { font-family: var(--f-titulo); font-size: 46pt; font-weight: 600; letter-spacing: -.035em; line-height: 1; margin: 0 0 12pt; }
 .capa-sub { font-size: 14pt; color: #c9d0da; max-width: 120mm; text-align: left; }
@@ -83,7 +84,7 @@ h2.sem-numero { border-bottom: 1.5pt solid var(--tinta); }
 
 <section class="capa">
   <div class="capa-topo">
-    <span class="logo"></span>
+    <span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 7.28595 22 4.92893 20.5355 3.46447C19.0711 2 16.714 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355Z"/><path d="M18 8.49998H14M18 14.5H14M18 17.5H14M10 8.49999H8M8 8.49999L6 8.49999M8 8.49999L8 6.49998M8 8.49999L8 10.5M9.5 14.5L8.00001 16M8.00001 16L6.50001 17.5M8.00001 16L6.5 14.5M8.00001 16L9.49999 17.5"/></g></svg></span>
     <div><p>Fundação Universidade Federal do Vale do São Francisco</p><p>Disciplina de Cálculo Numérico · Projeto Unidade 1 (Erros) · 2026.2</p></div>
   </div>
   <div class="capa-meio">
